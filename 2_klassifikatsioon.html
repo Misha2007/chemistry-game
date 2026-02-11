@@ -47,6 +47,7 @@
 
       #scoreBoard {
         padding: 10px;
+        font-size: 18px;
       }
 
       .controls {
@@ -59,6 +60,10 @@
         border: none;
         border-radius: 8px;
         font-size: 18px;
+      }
+
+      .powerup {
+        background-color: #ff5722;
       }
     </style>
   </head>
@@ -75,11 +80,18 @@
       <button onclick="moveRight()">▶</button>
     </div>
 
+    <audio id="bgMusic" loop autoplay>
+      <source src="background-music.mp3" type="audio/mp3" />
+    </audio>
+    <audio id="catchSound" src="catch-sound.mp3"></audio>
+    <audio id="missSound" src="miss-sound.mp3"></audio>
+
     <script>
       var gameArea = document.getElementById("gameArea");
       var basket = document.getElementById("basket");
       var score = 0;
       var lives = 3;
+      var gameSpeed = 1500; // Initial fall speed
 
       var substances = [
         { name: "CO2", type: "oksiid" },
@@ -90,7 +102,12 @@
         { name: "Mg(OH)2", type: "alus" },
         { name: "Na2O", type: "oksiid" },
         { name: "HNO3", type: "hape" },
+        { name: "Oksiidi Super", type: "powerup" }, // Power-up item
       ];
+
+      var bgMusic = document.getElementById("bgMusic");
+      var catchSound = document.getElementById("catchSound");
+      var missSound = document.getElementById("missSound");
 
       function updateScore() {
         document.getElementById("scoreBoard").innerText =
@@ -127,6 +144,11 @@
           var top = parseInt(div.style.top);
           div.style.top = top + 4 + "px";
 
+          // Increase game speed progressively
+          if (score > 10) gameSpeed = 1300;
+          if (score > 20) gameSpeed = 1100;
+          if (score > 30) gameSpeed = 900;
+
           if (top > gameArea.offsetHeight - 80) {
             clearInterval(fall);
 
@@ -135,15 +157,22 @@
             var itemLeft = div.offsetLeft;
             var itemRight = itemLeft + div.offsetWidth;
 
+            // Check if the falling item lands in the basket
             if (itemRight > basketLeft && itemLeft < basketRight) {
               if (div.dataset.type === "oksiid") {
                 score++;
+                catchSound.play(); // Play sound on correct catch
+              } else if (div.dataset.type === "powerup") {
+                score += 5; // Power-up item adds bonus points
+                div.style.backgroundColor = "#ff5722"; // Power-up color
               } else {
                 lives--;
+                missSound.play(); // Play sound on incorrect catch
               }
             } else {
               if (div.dataset.type === "oksiid") {
                 lives--;
+                missSound.play(); // Play sound when missing an "oksiid"
               }
             }
 
@@ -155,7 +184,7 @@
               location.reload();
             }
           }
-        }, 20);
+        }, gameSpeed);
       }
 
       setInterval(createFalling, 1500);
