@@ -140,17 +140,20 @@
         div.dataset.type = sub.type;
         gameArea.appendChild(div);
 
+        // Initial fall speed
+        var fallSpeed = 4; // Default fall speed for the item
+
+        // Increase fall speed based on score
+        if (score > 10) fallSpeed = 6;
+        if (score > 20) fallSpeed = 8;
+        if (score > 30) fallSpeed = 10;
+
         var fall = setInterval(function () {
           var top = parseInt(div.style.top);
-          div.style.top = top + 4 + "px";
-
-          // Increase game speed progressively
-          if (score > 10) gameSpeed = 1300;
-          if (score > 20) gameSpeed = 1100;
-          if (score > 30) gameSpeed = 900;
+          div.style.top = top + fallSpeed + "px"; // Apply the fall speed dynamically
 
           if (top > gameArea.offsetHeight - 80) {
-            clearInterval(fall);
+            clearInterval(fall); // Stop falling once the item hits the bottom
 
             var basketLeft = basket.offsetLeft;
             var basketRight = basketLeft + basket.offsetWidth;
@@ -177,17 +180,18 @@
             }
 
             updateScore();
-            div.remove();
+            div.remove(); // Remove the item after it reaches the bottom
 
             if (lives <= 0) {
               alert("Mäng läbi. Tulemus: " + score);
-              location.reload();
+              location.reload(); // Reload the game when lives reach 0
             }
           }
-        }, gameSpeed);
+        }, 20); // Falling interval (fixed) – 20ms for smooth animation
       }
 
-      setInterval(createFalling, 1500);
+      setInterval(createFalling, 1500); // Create new falling items every 1500ms
+
       updateScore();
     </script>
   </body>
