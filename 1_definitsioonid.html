@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="et">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Definitsiooni pusle – Drag & Drop</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, #1f4037, #99f2c8);
+        color: #333;
+        text-align: center;
+        padding: 40px 20px;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 40px;
+        border-radius: 20px;
+        max-width: 900px;
+        margin: auto;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      h2 {
+        margin-bottom: 30px;
+        color: #1f4037;
+      }
+
+      .blank {
+        border-bottom: 2px solid #1f4037;
+        min-width: 140px;
+        display: inline-block;
+        padding: 6px;
+        margin: 5px;
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+
+      #words {
+        margin-top: 20px;
+      }
+
+      .word {
+        display: inline-block;
+        background: #1f4037;
+        color: #fff;
+        padding: 10px 16px;
+        margin: 8px;
+        border-radius: 10px;
+        cursor: grab;
+        font-weight: 600;
+        user-select: none;
+      }
+
+      .word:active {
+        cursor: grabbing;
+      }
+
+      button {
+        padding: 14px 24px;
+        margin-top: 25px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        background: #1f4037;
+        color: #fff;
+        font-weight: bold;
+        transition:
+          transform 0.2s,
+          background 0.2s;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+        background: #2c7566;
+      }
+
+      #explanations {
+        margin-top: 30px;
+        text-align: left;
+        background: #ecf0f1;
+        color: #2c3e50;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        min-height: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Definitsiooni pusle – Drag & Drop</h2>
+
+      <div class="definition-box">
+        <p>
+          <strong>Oksiid:</strong> Aine, mis koosneb kahest elemendist, millest
+          üks on hapnik (O).
+        </p>
+        <p>
+          <strong>Hape:</strong> Aine, mis annab vesilahusesse vesinikioone
+          (H+).
+        </p>
+        <p>
+          <strong>Alus:</strong> Aine, mis annab vesilahusesse hüdroksiidioone
+          (OH-).
+        </p>
+      </div>
+
+      <p>
+        Oksiidid koosnevad kahest
+        <span class="blank" data-answer="elemendist"></span>, millest üks on
+        <span class="blank" data-answer="hapnik"></span>.
+      </p>
+
+      <p>
+        Happed annavad vesilahusesse
+        <span class="blank" data-answer="vesinikioone"></span>.
+      </p>
+
+      <div id="words"></div>
+
+      <button onclick="checkAnswers()">Kontrolli vastused</button>
+      <button onclick="redoPuzzle()">Proovi uuesti</button>
+      <button onclick="window.location.href = 'index.html'">
+        Tagasi menüüsse
+      </button>
+
+      <div id="explanations">
+        <strong>Selgitused ilmuvad siia pärast kontrolli</strong>
+      </div>
+    </div>
+
+    <script>
+      // define words and explanations
+      const words = [
+        {
+          text: "elemendist",
+          explanation: "Oksiid koosneb kahest elemendist, üks neist on hapnik.",
+        },
+        { text: "hapnik", explanation: "Oksiidi koostises peab olema hapnik." },
+        {
+          text: "vesinikioone",
+          explanation: "Happed annavad H+ ione, seega vesinikioone.",
+        },
+        {
+          text: "metallist",
+          explanation: "Mittemetallist ei sobi oksiidi kohta.",
+        },
+        {
+          text: "ioonist",
+          explanation: "Valed vastused. Õige on vesinikioone või elemendist.",
+        },
+      ];
+
+      // shuffle words
+      words.sort(() => Math.random() - 0.5);
+
+      const container = document.getElementById("words");
+
+      function createWordElements() {
+        container.innerHTML = "";
+        words.forEach((w) => {
+          const div = document.createElement("div");
+          div.className = "word";
+          div.innerText = w.text;
+          div.draggable = true;
+
+          div.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text", w.text);
+          });
+
+          container.appendChild(div);
+        });
+      }
+
+      // allow drop on blanks
+      function initBlanks() {
+        document.querySelectorAll(".blank").forEach((blank) => {
+          blank.innerText = "";
+          blank.style.backgroundColor = "";
+          blank.style.color = "";
+          blank.addEventListener("dragover", (e) => e.preventDefault());
+          blank.addEventListener("drop", (e) => {
+            e.preventDefault();
+            const droppedText = e.dataTransfer.getData("text");
+            blank.innerText = droppedText;
+          });
+        });
+      }
+
+      // check answers
+      function checkAnswers() {
+        let explanationsHTML = "";
+        document.querySelectorAll(".blank").forEach((blank) => {
+          const userAnswer = blank.innerText.trim();
+          const correctAnswer = blank.dataset.answer;
+
+          if (userAnswer === correctAnswer) {
+            blank.style.backgroundColor = "#2ecc71";
+            blank.style.color = "#fff";
+            explanationsHTML += `<p><strong>${userAnswer}:</strong> Õige!</p>`;
+          } else {
+            blank.style.backgroundColor = "#e74c3c";
+            blank.style.color = "#fff";
+            const explanation =
+              words.find((w) => w.text === correctAnswer)?.explanation || "";
+            explanationsHTML += `<p><strong>${userAnswer || "[tühi]"}:</strong> Vale. Õige: ${correctAnswer}. ${explanation}</p>`;
+          }
+        });
+
+        document.getElementById("explanations").innerHTML = explanationsHTML;
+      }
+
+      // redo puzzle
+      function redoPuzzle() {
+        initBlanks();
+        document.getElementById("explanations").innerHTML =
+          "<strong>Selgitused ilmuvad siia pärast kontrolli</strong>";
+      }
+
+      // initial setup
+      createWordElements();
+      initBlanks();
+    </script>
+  </body>
+</html>

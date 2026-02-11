@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="et">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anorgaaniliste ainete mängud</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, #141e30, #243b55);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .container {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        padding: 50px;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        width: 90%;
+        max-width: 600px;
+      }
+
+      h1 {
+        margin-bottom: 40px;
+        font-weight: 300;
+      }
+
+      button {
+        width: 100%;
+        padding: 18px;
+        margin: 15px 0;
+        font-size: 18px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.3s;
+        background: linear-gradient(135deg, #00c6ff, #0072ff);
+        color: white;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Anorgaaniliste ainete virtuaalsed mängud</h1>
+
+      <button onclick="go('1_definitsioonid.html')">
+        Definitsiooni mõiste kokkupanek
+      </button>
+
+      <button onclick="go('2_klassifikatsioon.html')">
+        Klassifikatsiooni mäng
+      </button>
+
+      <button onclick="go('3_kokkuviimine.html')">
+        Aine ja nimetuse kokkuviimine
+      </button>
+    </div>
+
+    <script>
+      function go(page) {
+        window.location.href = page;
+      }
+    </script>
+  </body>
+</html>

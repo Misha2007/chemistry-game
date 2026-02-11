@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="et">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Klassifikatsiooni mäng - Arcade</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(#141e30, #243b55);
+        overflow: hidden;
+        color: white;
+        text-align: center;
+      }
+
+      #gameArea {
+        position: relative;
+        width: 100%;
+        height: 80vh;
+        overflow: hidden;
+      }
+
+      #basket {
+        position: absolute;
+        bottom: 20px;
+        width: 120px;
+        height: 40px;
+        background: #00c6ff;
+        border-radius: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        line-height: 40px;
+        font-weight: bold;
+      }
+
+      .falling {
+        position: absolute;
+        background: white;
+        color: black;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-weight: bold;
+      }
+
+      #scoreBoard {
+        padding: 10px;
+      }
+
+      .controls {
+        margin-top: 10px;
+      }
+
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Püüa ainult: OKSIIDID</h2>
+    <div id="scoreBoard">Punktid: 0 | Elud: 3</div>
+
+    <div id="gameArea">
+      <div id="basket">OKSIID</div>
+    </div>
+
+    <div class="controls">
+      <button onclick="moveLeft()">◀</button>
+      <button onclick="moveRight()">▶</button>
+    </div>
+
+    <script>
+      var gameArea = document.getElementById("gameArea");
+      var basket = document.getElementById("basket");
+      var score = 0;
+      var lives = 3;
+
+      var substances = [
+        { name: "CO2", type: "oksiid" },
+        { name: "NaOH", type: "alus" },
+        { name: "HCl", type: "hape" },
+        { name: "NaCl", type: "sool" },
+        { name: "SO2", type: "oksiid" },
+        { name: "Mg(OH)2", type: "alus" },
+        { name: "Na2O", type: "oksiid" },
+        { name: "HNO3", type: "hape" },
+      ];
+
+      function updateScore() {
+        document.getElementById("scoreBoard").innerText =
+          "Punktid: " + score + " | Elud: " + lives;
+      }
+
+      function moveLeft() {
+        var left = basket.offsetLeft;
+        if (left > 0) basket.style.left = left - 30 + "px";
+      }
+
+      function moveRight() {
+        var left = basket.offsetLeft;
+        if (left < window.innerWidth - 140)
+          basket.style.left = left + 30 + "px";
+      }
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowLeft") moveLeft();
+        if (e.key === "ArrowRight") moveRight();
+      });
+
+      function createFalling() {
+        var sub = substances[Math.floor(Math.random() * substances.length)];
+        var div = document.createElement("div");
+        div.className = "falling";
+        div.innerText = sub.name;
+        div.style.left = Math.random() * (window.innerWidth - 100) + "px";
+        div.style.top = "0px";
+        div.dataset.type = sub.type;
+        gameArea.appendChild(div);
+
+        var fall = setInterval(function () {
+          var top = parseInt(div.style.top);
+          div.style.top = top + 4 + "px";
+
+          if (top > gameArea.offsetHeight - 80) {
+            clearInterval(fall);
+
+            var basketLeft = basket.offsetLeft;
+            var basketRight = basketLeft + basket.offsetWidth;
+            var itemLeft = div.offsetLeft;
+            var itemRight = itemLeft + div.offsetWidth;
+
+            if (itemRight > basketLeft && itemLeft < basketRight) {
+              if (div.dataset.type === "oksiid") {
+                score++;
+              } else {
+                lives--;
+              }
+            } else {
+              if (div.dataset.type === "oksiid") {
+                lives--;
+              }
+            }
+
+            updateScore();
+            div.remove();
+
+            if (lives <= 0) {
+              alert("Mäng läbi. Tulemus: " + score);
+              location.reload();
+            }
+          }
+        }, 20);
+      }
+
+      setInterval(createFalling, 1500);
+      updateScore();
+    </script>
+  </body>
+</html>

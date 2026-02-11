@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kokkuviimise mäng</title>
+<style>
+body { font-family: Arial; background:#0f2027; color:white; text-align:center; padding:20px; }
+.grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; max-width:600px; margin:auto; }
+.card { background:white; color:black; padding:10px; border-radius:6px; cursor:pointer; }
+.correct { background:#4caf50 !important; color:white; }
+</style>
+</head>
+<body>
+
+<h2>Aine ja nimetuse kokkuviimine</h2>
+
+<div class="grid" id="grid"></div>
+
+<script>
+var pairs = [
+["Na2O","naatriumoksiid"],
+["H2SO3","väävlishape"],
+["CaCO3","kaltsiumkarbonaat"],
+["CuSO4","vask(II)sulfaat"]
+];
+
+var cards=[];
+pairs.forEach(function(pair){
+    cards.push({text:pair[0],pair:pair[0]});
+    cards.push({text:pair[1],pair:pair[0]});
+});
+
+cards.sort(()=>Math.random()-0.5);
+
+var selected=null;
+var grid=document.getElementById("grid");
+
+cards.forEach(function(card){
+    var div=document.createElement("div");
+    div.className="card";
+    div.innerText=card.text;
+    div.onclick=function(){
+        if(!selected){
+            selected=card;
+            div.style.background="#ffd54f";
+        } else {
+            if(selected.pair===card.pair && selected!==card){
+                div.classList.add("correct");
+                document.querySelectorAll(".card").forEach(c=>{
+                    if(c.innerText===selected.text) c.classList.add("correct");
+                });
+            }
+            selected=null;
+            document.querySelectorAll(".card").forEach(c=>{
+                if(!c.classList.contains("correct")) c.style.background="white";
+            });
+        }
+    };
+    grid.appendChild(div);
+});
+</script>
+
+</body>
+</html>
