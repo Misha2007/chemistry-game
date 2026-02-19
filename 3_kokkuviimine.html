@@ -1,65 +1,143 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="et">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kokkuviimise mäng</title>
-<style>
-body { font-family: Arial; background:#0f2027; color:white; text-align:center; padding:20px; }
-.grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; max-width:600px; margin:auto; }
-.card { background:white; color:black; padding:10px; border-radius:6px; cursor:pointer; }
-.correct { background:#4caf50 !important; color:white; }
-</style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kokkuviimise mäng</title>
+    <style>
+      body {
+        font-family: Arial;
+        background: #0f2027;
+        color: white;
+        text-align: center;
+        padding: 20px;
+      }
 
-<h2>Aine ja nimetuse kokkuviimine</h2>
+      .back {
+        font-size: 24px;
+        cursor: pointer;
+        text-align: left;
+        display: block;
+        margin-bottom: 20px;
+        color: white;
+        text-decoration: none;
+      }
 
-<div class="grid" id="grid"></div>
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        max-width: 600px;
+        margin: auto;
+      }
 
-<script>
-var pairs = [
-["Na2O","naatriumoksiid"],
-["H2SO3","väävlishape"],
-["CaCO3","kaltsiumkarbonaat"],
-["CuSO4","vask(II)sulfaat"]
-];
+      .column {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
 
-var cards=[];
-pairs.forEach(function(pair){
-    cards.push({text:pair[0],pair:pair[0]});
-    cards.push({text:pair[1],pair:pair[0]});
-});
+      .card {
+        background: white;
+        color: black;
+        padding: 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
 
-cards.sort(()=>Math.random()-0.5);
+      .correct {
+        background: #4caf50 !important;
+        color: white;
+      }
 
-var selected=null;
-var grid=document.getElementById("grid");
+      .wrong {
+        background: #e53935 !important;
+        color: white;
+      }
 
-cards.forEach(function(card){
-    var div=document.createElement("div");
-    div.className="card";
-    div.innerText=card.text;
-    div.onclick=function(){
-        if(!selected){
-            selected=card;
-            div.style.background="#ffd54f";
-        } else {
-            if(selected.pair===card.pair && selected!==card){
-                div.classList.add("correct");
-                document.querySelectorAll(".card").forEach(c=>{
-                    if(c.innerText===selected.text) c.classList.add("correct");
-                });
-            }
-            selected=null;
-            document.querySelectorAll(".card").forEach(c=>{
-                if(!c.classList.contains("correct")) c.style.background="white";
-            });
-        }
-    };
-    grid.appendChild(div);
-});
-</script>
+      .selected {
+        background: #ffd54f !important;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="menu.html" class="back">← Tagasi</a>
 
-</body>
+    <h2>Aine ja nimetuse kokkuviimine</h2>
+
+    <div class="grid">
+      <div class="column" id="formulas"></div>
+      <div class="column" id="names"></div>
+    </div>
+
+    <script>
+      var pairs = [
+        ["Na2O", "naatriumoksiid"],
+        ["H2SO3", "väävlishape"],
+        ["CaCO3", "kaltsiumkarbonaat"],
+        ["CuSO4", "vask(II)sulfaat"],
+      ];
+
+      var selected = null;
+      var lock = false;
+
+      var formulasDiv = document.getElementById("formulas");
+      var namesDiv = document.getElementById("names");
+
+      var shuffledNames = [...pairs].sort(() => Math.random() - 0.5);
+
+      // Create formula column
+      pairs.forEach(function (pair) {
+        var div = document.createElement("div");
+        div.className = "card";
+        div.innerText = pair[0];
+        div.dataset.pair = pair[0];
+
+        div.onclick = function () {
+          if (selected || lock || div.classList.contains("correct")) return;
+          selected = div;
+          div.classList.add("selected");
+        };
+
+        formulasDiv.appendChild(div);
+      });
+
+      // Create name column
+      shuffledNames.forEach(function (pair) {
+        var div = document.createElement("div");
+        div.className = "card";
+        div.innerText = pair[1];
+        div.dataset.pair = pair[0];
+
+        div.onclick = function () {
+          if (!selected || lock || div.classList.contains("correct")) return;
+
+          lock = true;
+
+          if (selected.dataset.pair === div.dataset.pair) {
+            // Correct match
+            selected.classList.remove("selected");
+            selected.classList.add("correct");
+            div.classList.add("correct");
+            selected = null;
+            lock = false;
+          } else {
+            // Wrong match
+            selected.classList.add("wrong");
+            div.classList.add("wrong");
+
+            setTimeout(function () {
+              selected.classList.remove("selected", "wrong");
+              div.classList.remove("wrong");
+              selected = null;
+              lock = false;
+            }, 800);
+          }
+        };
+
+        namesDiv.appendChild(div);
+      });
+    </script>
+  </body>
 </html>
