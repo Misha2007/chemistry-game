@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
     <title>Kokkuviimise mäng</title>
     <style>
       body {
@@ -72,72 +73,162 @@
     </div>
 
     <script>
-      var pairs = [
-        ["Na2O", "naatriumoksiid"],
-        ["H2SO3", "väävlishape"],
-        ["CaCO3", "kaltsiumkarbonaat"],
-        ["CuSO4", "vask(II)sulfaat"],
-      ];
+      var chemistryDict = {
+        Lihtained: {
+          Si: "Räni",
+          He: "Heelium",
+          Na: "Naatrium",
+          Cu: "Vask",
+          Au: "Kuld",
+          H2: "Vesinik",
+          O2: "Hapnik",
+          Al: "Alumiinium",
+          Fe: "Raud",
+        },
 
+        Oksiidid: {
+          Na2O: "Naatriumoksiid",
+          Al2O3: "Alumiiniumoksiid",
+          P4O10: "Tetrafosfordekaoksiid",
+          CO2: "Süsinikdioksiid",
+          SO2: "Vääveldioksiid",
+          NO2: "Lämmastikdioksiid",
+          CaO: "Kaltsiumoksiid",
+          SiO2: "Ränidioksiid",
+          CO: "Süsinikoksiid",
+        },
+
+        Happed: {
+          H2SO3: "Väävlishape",
+          HNO3: "Lämmastikhape",
+          H2SiO3: "Ränihape",
+          HCl: "Vesinikkloriidhape",
+          HF: "Vesinikfluoriidhape",
+          H3PO4: "Fosforhape",
+          H2CO3: "Süsihape",
+        },
+
+        Alused: {
+          NaOH: "Naatriumhüdroksiid",
+          "Al(OH)3": "Alumiiniumhüdroksiid",
+          CuOH: "Vask(I)hüdroksiid",
+          "Mg(OH)2": "Magneesiumhüdroksiid",
+          KOH: "Kaaliumhüdroksiid",
+        },
+
+        Soolad: {
+          NaCl: "Naatriumkloriid",
+          AlCl3: "Alumiiniumkloriid",
+          KNO3: "Kaaliumnitraat",
+          MgCl2: "Magneesiumkloriid",
+          CaCO3: "Kaltsiumkarbonaat",
+          KI: "Kaaliumjodiid",
+          KBr: "Kaaliumbromiid",
+          NaNO2: "Naatriumnitrit",
+          CaSO4: "Kaltsiumsulfaat",
+          CuSO4: "Vask(II)sulfaat",
+          Na2CO3: "Naatriumkarbonaat",
+        },
+      };
+
+      var categories = Object.keys(chemistryDict);
+      var currentLevel = 0;
       var selected = null;
       var lock = false;
 
       var formulasDiv = document.getElementById("formulas");
       var namesDiv = document.getElementById("names");
+      var title = document.querySelector("h2");
 
-      var shuffledNames = [...pairs].sort(() => Math.random() - 0.5);
+      function formatFormula(text) {
+        return text.replace(/(\d+)/g, "<sub>$1</sub>");
+      }
 
-      // Create formula column
-      pairs.forEach(function (pair) {
-        var div = document.createElement("div");
-        div.className = "card";
-        div.innerText = pair[0];
-        div.dataset.pair = pair[0];
+      function loadLevel() {
+        formulasDiv.innerHTML = "";
+        namesDiv.innerHTML = "";
+        selected = null;
+        lock = false;
 
-        div.onclick = function () {
-          if (selected || lock || div.classList.contains("correct")) return;
-          selected = div;
-          div.classList.add("selected");
-        };
+        var categoryName = categories[currentLevel];
+        title.innerText = categoryName + " – Aine ja nimetuse kokkuviimine";
 
-        formulasDiv.appendChild(div);
-      });
+        var data = chemistryDict[categoryName];
+        var pairs = Object.entries(data);
 
-      // Create name column
-      shuffledNames.forEach(function (pair) {
-        var div = document.createElement("div");
-        div.className = "card";
-        div.innerText = pair[1];
-        div.dataset.pair = pair[0];
+        var shuffledNames = [...pairs].sort(() => Math.random() - 0.5);
 
-        div.onclick = function () {
-          if (!selected || lock || div.classList.contains("correct")) return;
+        // FORMULAS
+        pairs.forEach(function (pair) {
+          var div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = formatFormula(pair[0]);
+          div.dataset.pair = pair[0];
 
-          lock = true;
+          div.onclick = function () {
+            if (selected || lock || div.classList.contains("correct")) return;
+            selected = div;
+            div.classList.add("selected");
+          };
 
-          if (selected.dataset.pair === div.dataset.pair) {
-            // Correct match
-            selected.classList.remove("selected");
-            selected.classList.add("correct");
-            div.classList.add("correct");
-            selected = null;
-            lock = false;
-          } else {
-            // Wrong match
-            selected.classList.add("wrong");
-            div.classList.add("wrong");
+          formulasDiv.appendChild(div);
+        });
 
-            setTimeout(function () {
-              selected.classList.remove("selected", "wrong");
-              div.classList.remove("wrong");
+        // NAMES
+        shuffledNames.forEach(function (pair) {
+          var div = document.createElement("div");
+          div.className = "card";
+          div.innerText = pair[1];
+          div.dataset.pair = pair[0];
+
+          div.onclick = function () {
+            if (!selected || lock || div.classList.contains("correct")) return;
+
+            lock = true;
+
+            if (selected.dataset.pair === div.dataset.pair) {
+              selected.classList.remove("selected");
+              selected.classList.add("correct");
+              div.classList.add("correct");
+
               selected = null;
               lock = false;
-            }, 800);
-          }
-        };
 
-        namesDiv.appendChild(div);
-      });
+              checkLevelComplete();
+            } else {
+              selected.classList.add("wrong");
+              div.classList.add("wrong");
+
+              setTimeout(function () {
+                selected.classList.remove("selected", "wrong");
+                div.classList.remove("wrong");
+                selected = null;
+                lock = false;
+              }, 800);
+            }
+          };
+
+          namesDiv.appendChild(div);
+        });
+      }
+
+      function checkLevelComplete() {
+        var allCorrect = document.querySelectorAll(".card:not(.correct)");
+        if (allCorrect.length === 0) {
+          setTimeout(function () {
+            currentLevel++;
+
+            if (currentLevel < categories.length) {
+              alert("Tase läbitud! Järgmine tase: " + categories[currentLevel]);
+              loadLevel();
+            } else {
+              alert(" Kõik tasemed läbitud!");
+            }
+          }, 500);
+        }
+      }
+
+      loadLevel();
     </script>
   </body>
 </html>

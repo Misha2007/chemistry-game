@@ -1,0 +1,76 @@
+body {
+  font-family: "Times New Roman", serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+h2 {
+  font-family: Georgia, serif;
+  font-size: 32px;
+  letter-spacing: 1px;
+  margin-bottom: 25px;
+}
+
+.back {
+  font-size: 26px;
+  cursor: pointer;
+  text-align: left;
+  display: block;
+  margin-bottom: 10px;
+  color: white;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.back:hover {
+  color: #4fc3f7;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  max-width: 700px;
+  margin: auto;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.9);
+  color: black;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 18px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.correct {
+  background: #2e7d32 !important;
+  color: white;
+  box-shadow: 0 0 15px #00ff88;
+}
+
+.wrong {
+  background: #c62828 !important;
+  color: white;
+  box-shadow: 0 0 15px red;
+}
+
+.selected {
+  background: #ffeb3b !important;
+  color: black;
+  box-shadow: 0 0 15px yellow;
+}
