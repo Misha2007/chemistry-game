@@ -90,13 +90,33 @@
             var score = 0;
             var lives = 3;
 
-            var targetLabels = {
-                oksiid: "OKSIIDID",
-                hape: "HAPPED",
-                alus: "ALUSED",
-                sool: "SOOLAD",
-                metall: "METALLID",
-                mittemetall: "MITTEMETALLID",
+
+            gameArea.addEventListener("touchmove", function (e) {
+                e.preventDefault();
+            
+                let touch = e.touches[0];
+                let gameRect = gameArea.getBoundingClientRect();
+                let basketWidth = basket.offsetWidth;
+            
+                // Center basket on finger
+                let newLeft = touch.clientX - gameRect.left - basketWidth / 2;
+            
+                // Keep inside game area
+                if (newLeft < 0) newLeft = 0;
+                if (newLeft > gameArea.offsetWidth - basketWidth)
+                    newLeft = gameArea.offsetWidth - basketWidth;
+            
+                basket.style.left = newLeft + "px";
+            
+            }, { passive: false });
+                
+                var targetLabels = {
+                    oksiid: "OKSIIDID",
+                    hape: "HAPPED",
+                    alus: "ALUSED",
+                    sool: "SOOLAD",
+                    metall: "METALLID",
+                    mittemetall: "MITTEMETALLID",
             };
 
             var metals = new Set([
