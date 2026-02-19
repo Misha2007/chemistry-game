@@ -1,198 +1,381 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="et">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Klassifikatsiooni mäng - Arcade</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Klassifikatsiooni mang - Arcade</title>
 
-    <style>
-      body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: linear-gradient(#141e30, #243b55);
-        overflow: hidden;
-        color: white;
-        text-align: center;
-      }
-
-      #gameArea {
-        position: relative;
-        width: 100%;
-        height: 80vh;
-        overflow: hidden;
-      }
-
-      #basket {
-        position: absolute;
-        bottom: 20px;
-        width: 120px;
-        height: 40px;
-        background: #00c6ff;
-        border-radius: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
-        line-height: 40px;
-        font-weight: bold;
-      }
-
-      .falling {
-        position: absolute;
-        background: white;
-        color: black;
-        padding: 8px 12px;
-        border-radius: 8px;
-        font-weight: bold;
-      }
-
-      #scoreBoard {
-        padding: 10px;
-        font-size: 18px;
-      }
-
-      .controls {
-        margin-top: 10px;
-      }
-
-      button {
-        padding: 10px 20px;
-        margin: 5px;
-        border: none;
-        border-radius: 8px;
-        font-size: 18px;
-      }
-
-      .powerup {
-        background-color: #ff5722;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>Püüa ainult: OKSIIDID</h2>
-    <div id="scoreBoard">Punktid: 0 | Elud: 3</div>
-
-    <div id="gameArea">
-      <div id="basket">OKSIID</div>
-    </div>
-
-    <div class="controls">
-      <button onclick="moveLeft()">◀</button>
-      <button onclick="moveRight()">▶</button>
-    </div>
-
-    <audio id="bgMusic" loop autoplay>
-      <source src="background-music.mp3" type="audio/mp3" />
-    </audio>
-    <audio id="catchSound" src="catch-sound.mp3"></audio>
-    <audio id="missSound" src="miss-sound.mp3"></audio>
-
-    <script>
-      var gameArea = document.getElementById("gameArea");
-      var basket = document.getElementById("basket");
-      var score = 0;
-      var lives = 3;
-      var gameSpeed = 1500; // Initial fall speed
-
-      var substances = [
-        { name: "CO2", type: "oksiid" },
-        { name: "NaOH", type: "alus" },
-        { name: "HCl", type: "hape" },
-        { name: "NaCl", type: "sool" },
-        { name: "SO2", type: "oksiid" },
-        { name: "Mg(OH)2", type: "alus" },
-        { name: "Na2O", type: "oksiid" },
-        { name: "HNO3", type: "hape" },
-        { name: "Oksiidi Super", type: "powerup" }, // Power-up item
-      ];
-
-      var bgMusic = document.getElementById("bgMusic");
-      var catchSound = document.getElementById("catchSound");
-      var missSound = document.getElementById("missSound");
-
-      function updateScore() {
-        document.getElementById("scoreBoard").innerText =
-          "Punktid: " + score + " | Elud: " + lives;
-      }
-
-      function moveLeft() {
-        var left = basket.offsetLeft;
-        if (left > 0) basket.style.left = left - 30 + "px";
-      }
-
-      function moveRight() {
-        var left = basket.offsetLeft;
-        if (left < window.innerWidth - 140)
-          basket.style.left = left + 30 + "px";
-      }
-
-      document.addEventListener("keydown", function (e) {
-        if (e.key === "ArrowLeft") moveLeft();
-        if (e.key === "ArrowRight") moveRight();
-      });
-
-      function createFalling() {
-        var sub = substances[Math.floor(Math.random() * substances.length)];
-        var div = document.createElement("div");
-        div.className = "falling";
-        div.innerText = sub.name;
-        div.style.left = Math.random() * (window.innerWidth - 100) + "px";
-        div.style.top = "0px";
-        div.dataset.type = sub.type;
-        gameArea.appendChild(div);
-
-        // Initial fall speed
-        var fallSpeed = 4; // Default fall speed for the item
-
-        // Increase fall speed based on score
-        if (score > 10) fallSpeed = 6;
-        if (score > 20) fallSpeed = 8;
-        if (score > 30) fallSpeed = 10;
-
-        var fall = setInterval(function () {
-          var top = parseInt(div.style.top);
-          div.style.top = top + fallSpeed + "px"; // Apply the fall speed dynamically
-
-          if (top > gameArea.offsetHeight - 80) {
-            clearInterval(fall); // Stop falling once the item hits the bottom
-
-            var basketLeft = basket.offsetLeft;
-            var basketRight = basketLeft + basket.offsetWidth;
-            var itemLeft = div.offsetLeft;
-            var itemRight = itemLeft + div.offsetWidth;
-
-            // Check if the falling item lands in the basket
-            if (itemRight > basketLeft && itemLeft < basketRight) {
-              if (div.dataset.type === "oksiid") {
-                score++;
-                catchSound.play(); // Play sound on correct catch
-              } else if (div.dataset.type === "powerup") {
-                score += 5; // Power-up item adds bonus points
-                div.style.backgroundColor = "#ff5722"; // Power-up color
-              } else {
-                lives--;
-                missSound.play(); // Play sound on incorrect catch
-              }
-            } else {
-              if (div.dataset.type === "oksiid") {
-                lives--;
-                missSound.play(); // Play sound when missing an "oksiid"
-              }
+        <style>
+            body {
+                margin: 0;
+                font-family: Arial, sans-serif;
+                background: linear-gradient(#141e30, #243b55);
+                overflow: hidden;
+                color: white;
+                text-align: center;
             }
+
+            #gameArea {
+                position: relative;
+                width: 100%;
+                height: 80vh;
+                overflow: hidden;
+            }
+
+            #basket {
+                position: absolute;
+                bottom: 20px;
+                width: 160px;
+                height: 40px;
+                background: #00c6ff;
+                border-radius: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                text-align: center;
+                line-height: 40px;
+                font-weight: bold;
+                color: #00263a;
+            }
+
+            .falling {
+                position: absolute;
+                background: white;
+                color: black;
+                padding: 8px 12px;
+                border-radius: 8px;
+                font-weight: bold;
+            }
+
+            #scoreBoard {
+                padding: 10px;
+                font-size: 18px;
+            }
+
+            .controls {
+                margin-top: 10px;
+            }
+
+            button {
+                padding: 10px 20px;
+                margin: 5px;
+                border: none;
+                border-radius: 8px;
+                font-size: 18px;
+            }
+        </style>
+    </head>
+    <body>
+        <h2 id="instruction">Puua ainult: OKSIIDID</h2>
+        <div id="scoreBoard">Punktid: 0 | Elud: 3</div>
+
+        <div id="gameArea">
+            <div id="basket">OKSIID</div>
+        </div>
+
+        <div class="controls">
+            <button onclick="moveLeft()">&#9664;</button>
+            <button onclick="moveRight()">&#9654;</button>
+        </div>
+
+        <audio id="bgMusic" loop autoplay>
+            <source src="background-music.mp3" type="audio/mp3" />
+        </audio>
+        <audio id="catchSound" src="catch-sound.mp3"></audio>
+        <audio id="missSound" src="miss-sound.mp3"></audio>
+
+        <script>
+            var gameArea = document.getElementById("gameArea");
+            var basket = document.getElementById("basket");
+            var instruction = document.getElementById("instruction");
+            var score = 0;
+            var lives = 3;
+
+            var targetLabels = {
+                oksiid: "OKSIIDID",
+                hape: "HAPPED",
+                alus: "ALUSED",
+                sool: "SOOLAD",
+                metall: "METALLID",
+                mittemetall: "MITTEMETALLID",
+            };
+
+            var metals = new Set([
+                "Li",
+                "Na",
+                "K",
+                "Rb",
+                "Cs",
+                "Fr",
+                "Be",
+                "Mg",
+                "Ca",
+                "Sr",
+                "Ba",
+                "Ra",
+                "Sc",
+                "Ti",
+                "V",
+                "Cr",
+                "Mn",
+                "Fe",
+                "Co",
+                "Ni",
+                "Cu",
+                "Zn",
+                "Y",
+                "Zr",
+                "Nb",
+                "Mo",
+                "Tc",
+                "Ru",
+                "Rh",
+                "Pd",
+                "Ag",
+                "Cd",
+                "Hf",
+                "Ta",
+                "W",
+                "Re",
+                "Os",
+                "Ir",
+                "Pt",
+                "Au",
+                "Hg",
+                "Al",
+                "Ga",
+                "In",
+                "Sn",
+                "Tl",
+                "Pb",
+                "Bi",
+            ]);
+
+            var rawElementsFallback =
+                "SiO2,  H2, KOH,  H2SO4, Fe, ZnO, Ca(OH)2, H2CO3, MgO, NaNO2, Kl, CO2, CaCO3, SO2, HCl, Al(OH)3, NaCl, HNO3, CO, Mg(OH)2, SO3, MgSO4, KNO3, H2SO3, CO, NaOH, H2CO3, HCl, N2, KOH, CaSO4,  NaF, CO2, H2SO4, Fe, Ca(OH)2, NaCl, NO2, H2SO3, CaCO3, Al, O2, KI, SiO2, AlCl3, CaO, SO2, NaNO2, Na2CO3, MgCl2, H3PO4";
+
+            function normalizeFormula(formula) {
+                if (formula === "Kl") return "KI";
+                return formula;
+            }
+
+            function classifyFormula(name) {
+                var symbols = name.match(/[A-Z][a-z]?/g) || [];
+                var uniqueSymbols = Array.from(new Set(symbols));
+                var hasOH = /\(OH\)\d*|OH/.test(name);
+                var startsWithH = /^H/.test(name);
+                var simpleElement = /^([A-Z][a-z]?)(\d+)?$/.test(name);
+
+                if (simpleElement) {
+                    var elementSymbol = name.match(/^([A-Z][a-z]?)/)[1];
+                    return metals.has(elementSymbol) ? "metall" : "mittemetall";
+                }
+
+                if (hasOH && !startsWithH) return "alus";
+                if (startsWithH && !hasOH && !/^H\d*$/.test(name))
+                    return "hape";
+                if (
+                    uniqueSymbols.length === 2 &&
+                    uniqueSymbols.indexOf("O") !== -1
+                )
+                    return "oksiid";
+                return "sool";
+            }
+
+            function parseSubstances(source) {
+                var unique = Array.from(
+                    new Set(
+                        source
+                            .split(",")
+                            .map(function (x) {
+                                return normalizeFormula(x.trim());
+                            })
+                            .filter(Boolean),
+                    ),
+                );
+
+                return unique.map(function (name) {
+                    return { name: name, type: classifyFormula(name) };
+                });
+            }
+
+            var substances = [];
+            var availableTargets = [];
+            var itemsByType = {};
+            var caughtByType = {};
+            var currentTarget = "oksiid";
+
+            var catchSound = document.getElementById("catchSound");
+            var missSound = document.getElementById("missSound");
+
+            function updateScore() {
+                document.getElementById("scoreBoard").innerText =
+                    "Punktid: " + score + " | Elud: " + lives;
+            }
+
+            function targetLabel(type) {
+                return targetLabels[type] || type.toUpperCase();
+            }
+
+            function basketLabel(type) {
+                var label = targetLabel(type);
+                if (label.endsWith("ID")) return label.slice(0, -2);
+                if (label.endsWith("ED")) return label.slice(0, -2);
+                return label;
+            }
+
+            function updateTargetUI() {
+                instruction.innerText =
+                    "Puua ainult: " + targetLabel(currentTarget);
+                basket.innerText = basketLabel(currentTarget);
+            }
+
+            function rotateTarget() {
+                if (availableTargets.length < 2) return;
+                var next = currentTarget;
+                while (next === currentTarget) {
+                    next =
+                        availableTargets[
+                            Math.floor(Math.random() * availableTargets.length)
+                        ];
+                }
+                currentTarget = next;
+                updateTargetUI();
+            }
+
+            function resetCatchProgressForCurrentTarget() {
+                caughtByType[currentTarget] = new Set();
+            }
+
+            function advanceTarget() {
+                rotateTarget();
+                resetCatchProgressForCurrentTarget();
+            }
+
+            function checkTargetCompleted() {
+                var needed = itemsByType[currentTarget] || new Set();
+                var caught = caughtByType[currentTarget] || new Set();
+                if (needed.size > 0 && caught.size >= needed.size) {
+                    advanceTarget();
+                }
+            }
+
+            function moveLeft() {
+                var left = basket.offsetLeft;
+                if (left > 0) basket.style.left = left - 30 + "px";
+            }
+
+            function moveRight() {
+                var left = basket.offsetLeft;
+                if (left < window.innerWidth - 180)
+                    basket.style.left = left + 30 + "px";
+            }
+
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "ArrowLeft") moveLeft();
+                if (e.key === "ArrowRight") moveRight();
+            });
+
+            function createFalling() {
+                if (!substances.length) return;
+                var sub =
+                    substances[Math.floor(Math.random() * substances.length)];
+                var div = document.createElement("div");
+                div.className = "falling";
+                div.innerText = sub.name;
+                div.style.left =
+                    Math.random() * (window.innerWidth - 100) + "px";
+                div.style.top = "0px";
+                div.dataset.type = sub.type;
+                gameArea.appendChild(div);
+
+                var fallSpeed = 4;
+                if (score > 10) fallSpeed = 6;
+                if (score > 20) fallSpeed = 8;
+                if (score > 30) fallSpeed = 10;
+
+                var fall = setInterval(function () {
+                    var top = parseInt(div.style.top, 10);
+                    div.style.top = top + fallSpeed + "px";
+
+                    if (top > gameArea.offsetHeight - 80) {
+                        clearInterval(fall);
+
+                        var basketLeft = basket.offsetLeft;
+                        var basketRight = basketLeft + basket.offsetWidth;
+                        var itemLeft = div.offsetLeft;
+                        var itemRight = itemLeft + div.offsetWidth;
+                        var collected =
+                            itemRight > basketLeft && itemLeft < basketRight;
+
+                        if (collected) {
+                            if (div.dataset.type === currentTarget) {
+                                score++;
+                                caughtByType[currentTarget] =
+                                    caughtByType[currentTarget] || new Set();
+                                caughtByType[currentTarget].add(sub.name);
+                                catchSound.play();
+                                checkTargetCompleted();
+                            } else {
+                                lives--;
+                                missSound.play();
+                            }
+                        } else if (div.dataset.type === currentTarget) {
+                            lives--;
+                            missSound.play();
+                        }
+
+                        updateScore();
+                        div.remove();
+
+                        if (lives <= 0) {
+                            lives = 3;
+                            advanceTarget();
+                            updateScore();
+                        }
+                    }
+                }, 20);
+            }
+
+            setInterval(createFalling, 1500);
+
+            function initGameData(rawElements) {
+                substances = parseSubstances(rawElements);
+                availableTargets = Array.from(
+                    new Set(
+                        substances
+                            .map(function (s) {
+                                return s.type;
+                            })
+                            .filter(function (type) {
+                                return targetLabels[type];
+                            }),
+                    ),
+                );
+                currentTarget = availableTargets[0] || "oksiid";
+                itemsByType = {};
+                caughtByType = {};
+                substances.forEach(function (item) {
+                    if (!itemsByType[item.type])
+                        itemsByType[item.type] = new Set();
+                    itemsByType[item.type].add(item.name);
+                });
+                resetCatchProgressForCurrentTarget();
+                updateTargetUI();
+            }
+
+            fetch("elements.txt")
+                .then(function (response) {
+                    if (!response.ok) throw new Error("elements.txt not found");
+                    return response.text();
+                })
+                .then(function (text) {
+                    initGameData(text);
+                })
+                .catch(function () {
+                    initGameData(rawElementsFallback);
+                });
 
             updateScore();
-            div.remove(); // Remove the item after it reaches the bottom
-
-            if (lives <= 0) {
-              alert("Mäng läbi. Tulemus: " + score);
-              location.reload(); // Reload the game when lives reach 0
-            }
-          }
-        }, 20); // Falling interval (fixed) – 20ms for smooth animation
-      }
-
-      setInterval(createFalling, 1500); // Create new falling items every 1500ms
-
-      updateScore();
-    </script>
-  </body>
+        </script>
+    </body>
 </html>
