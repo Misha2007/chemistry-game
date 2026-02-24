@@ -3,121 +3,240 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Definitsiooni Pusle - Drag & Drop</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <title>Keemia Definitsioonide Mäng</title>
+
     <style>
       body {
         margin: 0;
         font-family: "Segoe UI", sans-serif;
         background: linear-gradient(135deg, #141e30, #243b55);
-        color: #333;
-        text-align: center;
-        padding: 40px 20px;
-        transition: all 0.3s;
+        padding: 90px 20px 40px 20px;
       }
+
+      .back-btn-top {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+      }
+      .back-btn {
+        background: white;
+        color: #141e30;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        transition: 0.2s;
+      }
+      .back-btn:hover {
+        background: #0072ff;
+        color: white;
+      }
+
       .container {
-        background: rgba(255, 255, 255, 0.95);
+        background: white;
         padding: 40px;
         border-radius: 20px;
         max-width: 900px;
         margin: auto;
         box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-        transition: all 0.3s;
       }
-      h2 {
-        margin-bottom: 30px;
-        color: rgba(255, 255, 255, 0.08);
-      }
+
       .blank {
-        border-bottom: 2px solid rgb(0, 0, 0);
-        min-width: 140px;
+        position: relative;
         display: inline-block;
-        padding: 6px;
+        min-width: 140px;
+        padding: 4px 6px; /* visible padding */
         margin: 5px;
         font-weight: bold;
-        font-size: 1.1em;
-        transition: all 0.3s;
+        border-bottom: 2px solid black;
+        cursor: pointer;
+        z-index: 0;
       }
-      #words {
-        margin-top: 20px;
+
+      /* Invisible hit area for easier drops */
+      .blank::before {
+        content: "";
+        position: absolute;
+        top: -18px; /* expand above */
+        bottom: -18px; /* expand below */
+        left: -10px; /* expand left */
+        right: -10px; /* expand right */
+        z-index: -1; /* behind text */
       }
+
       .word {
         display: inline-block;
-        background: rgba(255, 255, 255, 0.08);
-        color: #000000;
+        background: #eee;
         padding: 10px 16px;
         margin: 8px;
         border-radius: 10px;
         cursor: grab;
         font-weight: 600;
-        user-select: none;
-        transition: background-color 0.3s;
+        touch-action: none; /* prevents scrolling on mobile while dragging */
+        position: relative;
       }
+
       .word:active {
         cursor: grabbing;
-        background-color: #0072ff;
       }
-      button {
-        padding: 14px 24px;
-        margin-top: 25px;
+
+      button.action {
+        padding: 12px 20px;
+        margin: 15px 5px 0 5px;
         border: none;
-        border-radius: 10px;
+        border-radius: 8px;
         cursor: pointer;
-        background: rgba(255, 255, 255, 0.08);
-        color: #000;
         font-weight: bold;
-        transition:
-          transform 0.2s,
-          background 0.2s;
+        transition: all 0.2s ease;
+      }
+
+      /* CHECK BUTTON (default active style) */
+      #checkBtn:not(:disabled) {
+        background: #0072ff;
+        color: white;
+      }
+
+      #checkBtn {
+        width: 100%;
+      }
+
+      /* NEXT LEVEL BUTTON (stronger color) */
+      .top-buttons button {
+        padding: 10px 18px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.2s ease;
+      }
+
+      /* Disabled state for top buttons */
+      .top-buttons button:disabled {
+        background: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+      }
+
+      /* Next level more noticeable */
+      #nextBtn:not(:disabled) {
+        background: #27ae60;
+        color: white;
+        box-shadow: 0 0 10px rgba(39, 174, 96, 0.7);
+        animation: pulse 1.2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 5px rgba(39, 174, 96, 0.5);
+        }
+        50% {
+          box-shadow: 0 0 20px rgba(39, 174, 96, 1);
+        }
+        100% {
+          box-shadow: 0 0 5px rgba(39, 174, 96, 0.5);
+        }
+      }
+
+      /* Disabled state */
+      button.action:disabled {
+        background: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+        transform: none;
+        filter: none;
       }
 
       #explanations {
-        margin-top: 30px;
+        margin-top: 25px;
         text-align: left;
-        background: linear-gradient(135deg, #00c6ff, #0072ff);
-        color: #2c3e50;
-        padding: 20px;
+        background: #f4f4f4;
+        padding: 15px;
+        border-radius: 10px;
+        min-height: 60px;
+      }
+      #completionModal {
+        display: none; /* hidden by default */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5); /* semi-transparent overlay */
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      #completionModal .modal-content {
+        background: white;
+        padding: 30px 40px;
         border-radius: 15px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        min-height: 50px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      #completionModal button {
+        width: 100%;
       }
     </style>
   </head>
-  <body>
-    <div class="container">
-      <h2>Definitsiooni pusle – Drag & Drop</h2>
 
-      <div class="definition-box">
-        <p>
-          <strong>Oksiid:</strong> Aine, mis koosneb kahest elemendist, millest
-          üks on hapnik (O).
-        </p>
-        <p>
-          <strong>Hape:</strong> Aine, mis annab vesilahusesse vesinikioone
-          (H+).
-        </p>
-        <p>
-          <strong>Alus:</strong> Aine, mis annab vesilahusesse hüdroksiidioone
-          (OH-).
-        </p>
+  <body>
+    <div id="completionModal">
+      <div class="modal-content">
+        <h2>🎉 Kõik tasemed on läbitud!</h2>
+        <button class="back-btn" onclick="window.location.href = 'index.html'">
+          Tagasi menüüsse
+        </button>
+      </div>
+    </div>
+    <button
+      class="back-btn back-btn-top"
+      onclick="window.location.href = 'index.html'"
+    >
+      ← Tagasi menüüsse
+    </button>
+
+    <div class="container">
+      <div
+        class="top-bar"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        "
+      >
+        <h2 id="levelTitle" style="margin: 0"></h2>
+        <div class="top-buttons" style="display: flex; gap: 10px">
+          <button class="action" onclick="redoPuzzle()" title="Proovi uuesti">
+            <i class="fas fa-rotate-right"></i>
+          </button>
+
+          <!-- Next level button as icon -->
+          <button
+            id="nextBtn"
+            class="action"
+            onclick="nextLevel()"
+            disabled
+            title="Järgmine tase"
+          >
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
       </div>
 
-      <p>
-        Oksiidid koosnevad kahest
-        <span class="blank" data-answer="elemendist"></span>, millest üks on
-        <span class="blank" data-answer="hapnik"></span>.
-      </p>
-
-      <p>
-        Happed annavad vesilahusesse
-        <span class="blank" data-answer="vesinikioone"></span>.
-      </p>
-
+      <div id="sentenceContainer"></div>
       <div id="words"></div>
 
-      <button onclick="checkAnswers()">Kontrolli vastused</button>
-      <button onclick="redoPuzzle()">Proovi uuesti</button>
-      <button onclick="window.location.href = 'index.html'">
-        Tagasi menüüsse
+      <button id="checkBtn" class="action" onclick="checkAnswers()" disabled>
+        Kontrolli
       </button>
 
       <div id="explanations">
@@ -126,87 +245,335 @@
     </div>
 
     <script>
-      const words = [
+      let currentLevel = 0;
+      let draggedWord = null; // mobile drag variable
+
+      const levels = [
         {
-          text: "elemendist",
-          explanation: "Oksiid koosneb kahest elemendist, üks neist on hapnik.",
+          title: "Tase 1",
+          sentence: `Oksiidid on ained, mis koosnevad kahest 
+<span class="blank" data-answer="elemendist"></span>, 
+millest üks on 
+<span class="blank" data-answer="hapnik"></span>.`,
+          words: [
+            {
+              text: "elemendist",
+              explanation: "Oksiid koosneb kahest elemendist.",
+            },
+            {
+              text: "hapnik",
+              explanation: "Oksiidi koostises peab olema hapnik.",
+            },
+            {
+              text: "metallist",
+              explanation: "Vale – oksiid ei pea koosnema ainult metallist.",
+            },
+          ],
         },
-        { text: "hapnik", explanation: "Oksiidi koostises peab olema hapnik." },
+
         {
-          text: "vesinikioone",
-          explanation: "Happed annavad H+ ione, seega vesinikioone.",
+          title: "Tase 2",
+          sentence: `Oksiid on elemendi ühend 
+<span class="blank" data-answer="hapnikuga"></span>.`,
+          words: [
+            {
+              text: "hapnikuga",
+              explanation: "Oksiid tekib elemendi reageerimisel hapnikuga.",
+            },
+            {
+              text: "vesinikuga",
+              explanation: "Vale – see moodustaks hüdriidi.",
+            },
+          ],
         },
+
         {
-          text: "metallist",
-          explanation: "Mittemetallist ei sobi oksiidi kohta.",
+          title: "Tase 3",
+          sentence: `Lihtained jagunevad 
+<span class="blank" data-answer="metallideks"></span> 
+ja 
+<span class="blank" data-answer="mittemetallideks"></span>.`,
+          words: [
+            {
+              text: "metallideks",
+              explanation: "Metallid on üks lihtainete rühm.",
+            },
+            {
+              text: "mittemetallideks",
+              explanation: "Mittemetallid on teine lihtainete rühm.",
+            },
+            {
+              text: "hapeteks",
+              explanation: "Vale – happed ei ole lihtained.",
+            },
+          ],
         },
+
         {
-          text: "ioonist",
-          explanation: "Valed vastused. Õige on vesinikioone või elemendist.",
+          title: "Tase 4",
+          sentence: `Happed annavad vesilahusesse 
+<span class="blank" data-answer="vesinikioone"></span>.`,
+          words: [
+            { text: "vesinikioone", explanation: "Happed annavad H+ ioone." },
+            {
+              text: "hüdroksiidioone",
+              explanation: "Vale – neid annavad alused.",
+            },
+          ],
+        },
+
+        {
+          title: "Tase 5",
+          sentence: `Alused annavad vesilahusesse 
+<span class="blank" data-answer="hüdroksiidioone"></span>.`,
+          words: [
+            {
+              text: "hüdroksiidioone",
+              explanation: "Alused annavad OH- ioone.",
+            },
+            {
+              text: "vesinikioone",
+              explanation: "Vale – neid annavad happed.",
+            },
+          ],
+        },
+
+        {
+          title: "Tase 6",
+          sentence: `Soolad koosnevad 
+<span class="blank" data-answer="metallist"></span> 
+ja 
+<span class="blank" data-answer="happejäägist"></span>.`,
+          words: [
+            { text: "metallist", explanation: "Sool sisaldab metalliooni." },
+            { text: "happejäägist", explanation: "Sool sisaldab happejääki." },
+            {
+              text: "vesinikust",
+              explanation: "Vale – vesinik ei ole alati soola koostises.",
+            },
+          ],
+        },
+
+        {
+          title: "Tase 7",
+          sentence: `Neutraalse lahuse pH on 
+<span class="blank" data-answer="7"></span>.`,
+          words: [
+            { text: "7", explanation: "Neutraalses lahuses pH = 7." },
+            { text: "3", explanation: "Vale – see on happeline." },
+          ],
+        },
+
+        {
+          title: "Tase 8",
+          sentence: `Happelises lahuses on 
+<span class="blank" data-answer="vesinikioone"></span> 
+rohkem kui hüdroksiidioone.`,
+          words: [
+            {
+              text: "vesinikioone",
+              explanation: "Happelises lahuses on H+ ülekaalus.",
+            },
+            {
+              text: "hüdroksiidioone",
+              explanation: "Vale – neid on rohkem aluselises lahuses.",
+            },
+          ],
+        },
+
+        {
+          title: "Tase 9",
+          sentence: `Aluselises lahuses on rohkem 
+<span class="blank" data-answer="hüdroksiidioone"></span> 
+kui vesinikioone.`,
+          words: [
+            {
+              text: "hüdroksiidioone",
+              explanation: "Aluselises lahuses on OH- ülekaalus.",
+            },
+            {
+              text: "vesinikioone",
+              explanation: "Vale – see iseloomustab happelist lahust.",
+            },
+          ],
+        },
+
+        {
+          title: "Tase 10",
+          sentence: `Indikaator on aine, mille värvus sõltub 
+<span class="blank" data-answer="lahuse keskkonnast"></span>.`,
+          words: [
+            {
+              text: "lahuse keskkonnast",
+              explanation: "Indikaator muudab värvi sõltuvalt pH-st.",
+            },
+            {
+              text: "temperatuurist",
+              explanation:
+                "Vale – temperatuur ei määra indikaatori põhifunktsiooni.",
+            },
+          ],
         },
       ];
+      function loadLevel() {
+        const level = levels[currentLevel];
+        document.getElementById("levelTitle").innerText = level.title;
+        document.getElementById("sentenceContainer").innerHTML = level.sentence;
 
-      words.sort(() => Math.random() - 0.5);
+        const wordsContainer = document.getElementById("words");
+        wordsContainer.innerHTML = "";
 
-      const container = document.getElementById("words");
+        level.words
+          .sort(() => Math.random() - 0.5)
+          .forEach((w) => {
+            const div = document.createElement("div");
+            div.className = "word";
+            div.innerText = w.text;
+            div.draggable = true;
 
-      function createWordElements() {
-        container.innerHTML = "";
-        words.forEach((w) => {
-          const div = document.createElement("div");
-          div.className = "word";
-          div.innerText = w.text;
-          div.draggable = true;
-          div.addEventListener("dragstart", (e) => {
-            e.dataTransfer.setData("text", w.text);
+            // Desktop drag
+            div.addEventListener("dragstart", (e) => {
+              e.dataTransfer.setData("text", w.text);
+            });
+
+            // Mobile touch drag
+            div.addEventListener("touchstart", touchStart, { passive: false });
+            div.addEventListener("touchmove", touchMove, { passive: false });
+            div.addEventListener("touchend", touchEnd);
+
+            wordsContainer.appendChild(div);
           });
-          container.appendChild(div);
-        });
+
+        initBlanks();
       }
 
       function initBlanks() {
+        document.getElementById("checkBtn").disabled = true;
+        document.getElementById("nextBtn").disabled = true;
+
         document.querySelectorAll(".blank").forEach((blank) => {
           blank.innerText = "";
           blank.style.backgroundColor = "";
-          blank.style.color = "";
+
           blank.addEventListener("dragover", (e) => e.preventDefault());
+
           blank.addEventListener("drop", (e) => {
             e.preventDefault();
-            const droppedText = e.dataTransfer.getData("text");
-            blank.innerText = droppedText;
+            blank.innerText = e.dataTransfer.getData("text");
+            updateCheckButtonState();
+          });
+
+          // Mobile touch "tap-to-fill"
+          blank.addEventListener("touchstart", (e) => {
+            if (draggedWord) {
+              blank.innerText = draggedWord.innerText;
+              updateCheckButtonState();
+              draggedWord.style.position = "relative";
+              draggedWord = null;
+            }
           });
         });
+      }
+
+      function updateCheckButtonState() {
+        const blanks = document.querySelectorAll(".blank");
+        const allFilled = [...blanks].every(
+          (blank) => blank.innerText.trim() !== "",
+        );
+        document.getElementById("checkBtn").disabled = !allFilled;
       }
 
       function checkAnswers() {
         let explanationsHTML = "";
+        let allCorrect = true;
+        const level = levels[currentLevel];
+
         document.querySelectorAll(".blank").forEach((blank) => {
           const userAnswer = blank.innerText.trim();
-          const correctAnswer = blank.dataset.answer;
-          if (userAnswer === correctAnswer) {
+          const correct = blank.dataset.answer;
+
+          if (userAnswer === correct) {
             blank.style.backgroundColor = "#2ecc71";
-            blank.style.color = "#000";
-            explanationsHTML += `<p><strong>${userAnswer}:</strong> Õige!</p>`;
+            explanationsHTML += `<p><strong>${userAnswer}</strong>: Õige! ✔</p>`;
           } else {
             blank.style.backgroundColor = "#e74c3c";
-            blank.style.color = "#000";
-            const explanation =
-              words.find((w) => w.text === correctAnswer)?.explanation || "";
-            explanationsHTML += `<p><strong>${userAnswer || "[tühi]"}:</strong> Vale. Õige: ${correctAnswer}. ${explanation}</p>`;
+            const explanation = level.words.find(
+              (w) => w.text === correct,
+            )?.explanation;
+            explanationsHTML += `<p><strong>${userAnswer || "[tühi]"}</strong>: Vale ❌ Õige: ${correct}. ${explanation}</p>`;
+            allCorrect = false;
           }
         });
 
         document.getElementById("explanations").innerHTML = explanationsHTML;
+        document.getElementById("nextBtn").disabled = !allCorrect;
+        document.getElementById("checkBtn").disabled = allCorrect;
       }
 
       function redoPuzzle() {
-        initBlanks();
+        loadLevel();
         document.getElementById("explanations").innerHTML =
           "<strong>Selgitused ilmuvad siia pärast kontrolli</strong>";
       }
 
-      createWordElements();
-      initBlanks();
+      function nextLevel() {
+        currentLevel++;
+        if (currentLevel >= levels.length) {
+          // Show modal instead of alert
+          document.getElementById("completionModal").style.display = "flex";
+          currentLevel = 0;
+          return;
+        }
+        loadLevel();
+      }
+
+      // --- Mobile touch drag functions ---
+      function touchStart(e) {
+        draggedWord = e.target;
+        draggedWord.style.position = "absolute";
+        draggedWord.style.zIndex = 1000;
+      }
+
+      function touchMove(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        draggedWord.style.left =
+          touch.clientX - draggedWord.offsetWidth / 2 + "px";
+        draggedWord.style.top =
+          touch.clientY - draggedWord.offsetHeight / 2 + "px";
+      }
+
+      function touchEnd(e) {
+        if (draggedWord) {
+          const touch = e.changedTouches[0];
+          const x = touch.clientX;
+          const y = touch.clientY;
+
+          // Temporarily hide dragged word so elementFromPoint can detect the blank
+          draggedWord.style.display = "none";
+          const blank = document.elementFromPoint(x, y);
+          draggedWord.style.display = "inline-block";
+
+          if (blank && blank.classList.contains("blank")) {
+            blank.innerText = draggedWord.innerText;
+            updateCheckButtonState();
+
+            // reset dragged word position
+            draggedWord.style.position = "relative";
+            draggedWord.style.left = "0px";
+            draggedWord.style.top = "0px";
+            draggedWord = null;
+          }
+
+          // Reset dragged word position
+          draggedWord.style.position = "relative";
+          draggedWord.style.left = "0px";
+          draggedWord.style.top = "0px";
+          draggedWord = null;
+        }
+      }
+
+      loadLevel();
     </script>
   </body>
 </html>
