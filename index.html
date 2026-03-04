@@ -1,9 +1,10 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="et">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Anorgaaniliste ainete mängud</title>
+    <meta name="description" content="Anorgaaniliste ainete opimangud: definitsioonid, klassifikatsioon ja kokkuviimine." />
+    <title>Anorgaaniliste ainete mangud</title>
 
     <style>
       body {
@@ -14,29 +15,29 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        min-height: 100vh;
       }
 
       .container {
         text-align: center;
         background: rgba(255, 255, 255, 0.08);
         backdrop-filter: blur(10px);
-        padding: 50px;
+        padding: 40px;
         border-radius: 20px;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        width: 90%;
-        max-width: 600px;
+        width: min(90%, 640px);
       }
 
       h1 {
-        margin-bottom: 40px;
+        margin-bottom: 30px;
         font-weight: 300;
       }
 
-      button {
+      .menu-btn {
+        display: block;
         width: 100%;
         padding: 18px;
-        margin: 15px 0;
+        margin: 12px 0;
         font-size: 18px;
         border: none;
         border-radius: 12px;
@@ -44,36 +45,66 @@
         transition: 0.3s;
         background: linear-gradient(135deg, #00c6ff, #0072ff);
         color: white;
+        text-decoration: none;
+        box-sizing: border-box;
       }
 
-      button:hover {
-        transform: scale(1.05);
+      .menu-btn:hover {
+        transform: scale(1.03);
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+      }
+
+      .qr-wrap {
+        margin-top: 22px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      #siteQr {
+        width: 150px;
+        height: 150px;
+        border-radius: 10px;
+        background: white;
+        padding: 8px;
+      }
+
+      #siteUrl {
+        display: block;
+        margin-top: 10px;
+        color: #d6eeff;
+        word-break: break-all;
       }
     </style>
   </head>
 
   <body>
-    <div class="container">
-      <h1>Anorgaaniliste ainete virtuaalsed mängud</h1>
+    <main class="container">
+      <h1>Anorgaaniliste ainete virtuaalsed mangud</h1>
 
-      <button onclick="go('1_definitsioonid.html')">
-        Definitsiooni mõiste kokkupanek
-      </button>
+      <nav aria-label="Mangude menuu">
+        <a class="menu-btn" href="1_definitsioonid.html">Definitsiooni moiste kokkupanek</a>
+        <a class="menu-btn" href="2_klassifikatsioon.html">Klassifikatsiooni mang</a>
+        <a class="menu-btn" href="3_kokkuviimine.html">Aine ja nimetuse kokkuviimine</a>
+      </nav>
 
-      <button onclick="go('2_klassifikatsioon.html')">
-        Klassifikatsiooni mäng
-      </button>
-
-      <button onclick="go('3_kokkuviimine.html')">
-        Aine ja nimetuse kokkuviimine
-      </button>
-    </div>
+      <section class="qr-wrap" aria-label="Lehe URL ja QR">
+        <div>Ava see leht telefonis (QR):</div>
+        <img id="siteQr" alt="Veebilehe QR-kood" />
+        <a id="siteUrl" href="#" target="_blank" rel="noopener"></a>
+      </section>
+    </main>
 
     <script>
-      function go(page) {
-        window.location.href = page;
-      }
+      const pageUrl = window.location.href;
+      const qrImg = document.getElementById("siteQr");
+      const siteUrl = document.getElementById("siteUrl");
+      const encoded = encodeURIComponent(pageUrl);
+
+      qrImg.src =
+        "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" +
+        encoded;
+      siteUrl.href = pageUrl;
+      siteUrl.innerText = pageUrl;
     </script>
   </body>
 </html>

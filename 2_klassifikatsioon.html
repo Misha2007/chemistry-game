@@ -51,6 +51,16 @@
                 font-size: 18px;
             }
 
+            .guide {
+                max-width: 900px;
+                margin: 10px auto 0 auto;
+                padding: 10px 14px;
+                border-radius: 10px;
+                background: rgba(255, 255, 255, 0.12);
+                font-size: 15px;
+                line-height: 1.4;
+            }
+
             .controls {
                 margin-top: 10px;
             }
@@ -66,6 +76,11 @@
     </head>
     <body>
         <h2 id="instruction">Puua ainult: OKSIIDID</h2>
+        <div class="guide">
+            Juhend: liiguta korvi nooltega (voi puuteekraanil sormega) ja pyya ainult neid aineid, mida juhises naidatakse.
+            Kui pyyad vale aine voi lased oige aine mooda, kaotad elu.
+            Sihtgrupp vahetub mangu jooksul automaatselt.
+        </div>
         <div id="scoreBoard">Punktid: 0 | Elud: 3</div>
 
         <div id="gameArea">
@@ -238,6 +253,7 @@
 
             function basketLabel(type) {
                 var label = targetLabel(type);
+                if (label === "HAPPED") return "HAPE";
                 if (label.endsWith("ID")) return label.slice(0, -2);
                 if (label.endsWith("ED")) return label.slice(0, -2);
                 return label;
