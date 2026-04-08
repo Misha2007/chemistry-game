@@ -3,86 +3,317 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <title>Kokkuviimise mäng</title>
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: Arial;
-        background: #0f2027;
+        font-family: "Inter", "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
         color: white;
         text-align: center;
         padding: 20px;
+        min-height: 100vh;
       }
 
       .back {
-        font-size: 24px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        font-weight: 600;
         cursor: pointer;
         text-align: left;
-        display: block;
         margin-bottom: 20px;
-        color: white;
+        color: rgba(255, 255, 255, 0.8);
         text-decoration: none;
+        transition: all 0.3s;
+        padding: 10px 18px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+      }
+
+      .back:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateX(-3px);
+        color: white;
+      }
+
+      h2 {
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, #fff, #a8c0ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .guide {
+        max-width: 700px;
+        margin: 0 auto 24px auto;
+        padding: 14px 20px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.08);
+        line-height: 1.5;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      /* Category progress */
+      .category-pills {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+      }
+
+      .category-pill {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s;
+      }
+
+      .category-pill.active {
+        background: linear-gradient(135deg, #00c6ff, #0072ff);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 4px 12px rgba(0, 114, 255, 0.4);
+      }
+
+      .category-pill.completed {
+        background: rgba(39, 174, 96, 0.3);
+        color: #2ecc71;
+        border-color: rgba(39, 174, 96, 0.5);
       }
 
       .grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 20px;
-        max-width: 600px;
+        max-width: 700px;
         margin: auto;
       }
 
       .column {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
+      }
+
+      .column-label {
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: rgba(255, 255, 255, 0.4);
+        margin-bottom: 4px;
       }
 
       .card {
-        background: white;
-        color: black;
-        padding: 10px;
-        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.95);
+        color: #1a1a2e;
+        padding: 14px 16px;
+        border-radius: 14px;
         cursor: pointer;
-        transition: 0.3s;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 16px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border: 2px solid transparent;
+        user-select: none;
+      }
+
+      .card:hover:not(.correct) {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        border-color: rgba(0, 114, 255, 0.3);
+      }
+
+      .card:active:not(.correct) {
+        transform: translateY(0);
       }
 
       .correct {
-        background: #4caf50 !important;
-        color: white;
+        background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+        border-color: transparent;
+        pointer-events: none;
       }
 
       .wrong {
-        background: #e53935 !important;
-        color: white;
+        background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        border-color: transparent;
+        animation: shake 0.4s ease;
+      }
+
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
       }
 
       .selected {
-        background: #ffd54f !important;
+        background: linear-gradient(135deg, #f39c12, #f1c40f) !important;
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
+        border-color: transparent;
       }
-      .guide {
-        max-width: 700px;
-        margin: 0 auto 20px auto;
-        padding: 10px 14px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.12);
-        line-height: 1.4;
+
+      /* Completion overlay */
+      .completion-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      .completion-overlay.show {
+        display: flex;
+      }
+
+      .completion-content {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        padding: 40px;
+        border-radius: 24px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        animation: modalPop 0.3s ease-out;
+        max-width: 420px;
+        width: 90%;
+      }
+
+      @keyframes modalPop {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+      }
+
+      .completion-content .trophy {
+        font-size: 64px;
+        margin-bottom: 16px;
+      }
+
+      .completion-content h2 {
+        margin-bottom: 12px;
+      }
+
+      .completion-content p {
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 24px;
+      }
+
+      .completion-content button {
+        display: inline-block;
+        padding: 14px 32px;
+        margin: 6px;
+        border: none;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .completion-content .btn-primary {
+        background: linear-gradient(135deg, #00c6ff, #0072ff);
+        color: white;
+        box-shadow: 0 6px 20px rgba(0, 114, 255, 0.4);
+      }
+
+      .completion-content .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0, 114, 255, 0.6);
+      }
+
+      .completion-content .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+
+      .completion-content .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      @media (max-width: 600px) {
+        .grid {
+          gap: 10px;
+        }
+
+        .card {
+          padding: 12px;
+          font-size: 14px;
+        }
+
+        h2 {
+          font-size: 22px;
+        }
       }
     </style>
   </head>
   <body>
-    <a href="index.html" class="back">← Tagasi</a>
+    <a href="index.html" class="back"><i class="fas fa-arrow-left"></i> Tagasi menüüsse</a>
 
-    <h2>Aine ja nimetuse kokkuviimine</h2>
+    <h2 id="levelTitle">Aine ja nimetuse kokkuviimine</h2>
     <div class="guide">
-      Juhend: vali vasakust tulbast valem ja seejarel paremast tulbast sellele vastav nimetus.
-      Oige paar jaab roheliseks. Vale paar muutub korraks punaseks.
-      Kui kogu tase on oige, liigud automaatselt jargmisse kategooriasse.
+      Juhend: vali vasakust tulbast valem ja seejärel paremast tulbast sellele vastav nimetus.
+      Õige paar jääb roheliseks. Vale paar muutub korraks punaseks.
+      Kui kogu tase on õige, liigud automaatselt järgmisse kategooriasse.
     </div>
 
+    <!-- Category progress pills -->
+    <div class="category-pills" id="categoryPills"></div>
+
     <div class="grid">
-      <div class="column" id="formulas"></div>
-      <div class="column" id="names"></div>
+      <div class="column" id="formulas">
+        <div class="column-label">Valem</div>
+      </div>
+      <div class="column" id="names">
+        <div class="column-label">Nimetus</div>
+      </div>
+    </div>
+
+    <!-- Completion overlay -->
+    <div id="completionOverlay" class="completion-overlay">
+      <div class="completion-content">
+        <div class="trophy">🏆</div>
+        <h2 id="completionTitle">Tase läbitud!</h2>
+        <p id="completionMsg">Suurepärane töö!</p>
+        <button class="btn-primary" id="nextLevelBtn" onclick="nextLevel()">
+          <i class="fas fa-arrow-right"></i> Järgmine tase
+        </button>
+        <button class="btn-secondary" onclick="goToMenu()">
+          <i class="fas fa-home"></i> Menüü
+        </button>
+      </div>
     </div>
 
     <script>
@@ -151,20 +382,37 @@
 
       var formulasDiv = document.getElementById("formulas");
       var namesDiv = document.getElementById("names");
-      var title = document.querySelector("h2");
+      var title = document.getElementById("levelTitle");
+      var pillsContainer = document.getElementById("categoryPills");
+      var completionOverlay = document.getElementById("completionOverlay");
 
       function formatFormula(text) {
         return text.replace(/(\d+)/g, "<sub>$1</sub>");
       }
 
+      function renderCategoryPills() {
+        pillsContainer.innerHTML = "";
+        categories.forEach(function (cat, i) {
+          var pill = document.createElement("div");
+          pill.className = "category-pill";
+          pill.innerText = cat;
+          if (i === currentLevel) pill.classList.add("active");
+          else if (i < currentLevel) pill.classList.add("completed");
+          pillsContainer.appendChild(pill);
+        });
+      }
+
       function loadLevel() {
-        formulasDiv.innerHTML = "";
-        namesDiv.innerHTML = "";
+        formulasDiv.innerHTML = '<div class="column-label">Valem</div>';
+        namesDiv.innerHTML = '<div class="column-label">Nimetus</div>';
         selected = null;
         lock = false;
+        completionOverlay.classList.remove("show");
 
         var categoryName = categories[currentLevel];
-        title.innerText = categoryName + " – Aine ja nimetuse kokkuviimine";
+        title.innerText = categoryName;
+
+        renderCategoryPills();
 
         var data = chemistryDict[categoryName];
         var pairs = Object.entries(data);
@@ -229,16 +477,30 @@
         var allCorrect = document.querySelectorAll(".card:not(.correct)");
         if (allCorrect.length === 0) {
           setTimeout(function () {
-            currentLevel++;
-
-            if (currentLevel < categories.length) {
-              alert("Tase läbitud! Järgmine tase: " + categories[currentLevel]);
-              loadLevel();
+            if (currentLevel < categories.length - 1) {
+              document.getElementById("completionTitle").innerText = "Tase läbitud!";
+              document.getElementById("completionMsg").innerText = "Järgmine tase: " + categories[currentLevel + 1];
+              document.getElementById("nextLevelBtn").style.display = "inline-block";
+              completionOverlay.classList.add("show");
             } else {
-              alert(" Kõik tasemed läbitud!");
+              document.getElementById("completionTitle").innerText = "🎉 Kõik tasemed läbitud!";
+              document.getElementById("completionMsg").innerText = "Suurepärane töö! Sa meisterdasid kõik kategooriad.";
+              document.getElementById("nextLevelBtn").style.display = "none";
+              completionOverlay.classList.add("show");
             }
-          }, 500);
+          }, 400);
         }
+      }
+
+      function nextLevel() {
+        currentLevel++;
+        if (currentLevel < categories.length) {
+          loadLevel();
+        }
+      }
+
+      function goToMenu() {
+        window.location.href = "index.html";
       }
 
       loadLevel();

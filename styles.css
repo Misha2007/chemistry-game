@@ -1,37 +1,67 @@
+/* 
+ * Shared Chemistry Game Styles
+ * Modern glassmorphism design system
+ */
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Typography */
 body {
-  font-family: "Times New Roman", serif;
-  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  font-family: "Inter", "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
   color: white;
   text-align: center;
   padding: 20px;
+  min-height: 100vh;
 }
 
 h2 {
-  font-family: Georgia, serif;
-  font-size: 32px;
-  letter-spacing: 1px;
-  margin-bottom: 25px;
+  font-family: "Inter", Georgia, serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #fff, #a8c0ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
+/* Back button */
 .back {
-  font-size: 26px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
   text-align: left;
-  display: block;
-  margin-bottom: 10px;
-  color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  transition: 0.3s;
+  transition: all 0.3s;
+  padding: 10px 18px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .back:hover {
   color: #4fc3f7;
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(-3px);
 }
 
+/* Grid layout */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 40px;
+  gap: 24px;
   max-width: 700px;
   margin: auto;
 }
@@ -39,38 +69,71 @@ h2 {
 .column {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
 }
 
+/* Cards */
 .card {
-  background: rgba(255, 255, 255, 0.9);
-  color: black;
-  padding: 12px;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1a2e;
+  padding: 14px 16px;
+  border-radius: 14px;
   cursor: pointer;
-  transition: 0.3s;
-  font-size: 18px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 2px solid transparent;
+  user-select: none;
 }
 
 .card:hover {
-  transform: scale(1.05);
+  transform: scale(1.03);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  border-color: rgba(0, 114, 255, 0.3);
 }
 
+/* Card states */
 .correct {
-  background: #2e7d32 !important;
-  color: white;
-  box-shadow: 0 0 15px #00ff88;
+  background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+  color: white !important;
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+  border-color: transparent;
 }
 
 .wrong {
-  background: #c62828 !important;
-  color: white;
-  box-shadow: 0 0 15px red;
+  background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+  color: white !important;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+  border-color: transparent;
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }
 
 .selected {
-  background: #ffeb3b !important;
-  color: black;
-  box-shadow: 0 0 15px yellow;
+  background: linear-gradient(135deg, #f39c12, #f1c40f) !important;
+  color: white !important;
+  box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
+  border-color: transparent;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .grid {
+    gap: 12px;
+  }
+
+  .card {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
 }

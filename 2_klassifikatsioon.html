@@ -3,93 +3,402 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Klassifikatsiooni mang - Arcade</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <title>Klassifikatsiooni mäng - Arcade</title>
 
         <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
             body {
                 margin: 0;
-                font-family: Arial, sans-serif;
-                background: linear-gradient(#141e30, #243b55);
+                font-family: "Inter", Arial, sans-serif;
+                background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
                 overflow: hidden;
                 color: white;
                 text-align: center;
+                min-height: 100vh;
             }
 
             #gameArea {
                 position: relative;
                 width: 100%;
-                height: 80vh;
+                height: 70vh;
                 overflow: hidden;
+                background: linear-gradient(180deg, rgba(15, 12, 41, 0.3), rgba(48, 43, 99, 0.5));
+                border-radius: 0 0 24px 24px;
             }
 
             #basket {
                 position: absolute;
                 bottom: 20px;
                 width: 160px;
-                height: 40px;
-                background: #00c6ff;
-                border-radius: 10px;
+                height: 50px;
+                background: linear-gradient(135deg, #00c6ff, #0072ff);
+                border-radius: 14px;
                 left: 50%;
                 transform: translateX(-50%);
                 text-align: center;
-                line-height: 40px;
-                font-weight: bold;
-                color: #00263a;
+                line-height: 50px;
+                font-weight: 700;
+                font-size: 16px;
+                color: white;
+                box-shadow: 0 6px 20px rgba(0, 114, 255, 0.5);
+                transition: left 0.1s ease;
+                letter-spacing: 0.5px;
+            }
+
+            @media (max-width: 768px) {
+                #basket {
+                    width: 130px;
+                    font-size: 14px;
+                    height: 44px;
+                    line-height: 44px;
+                }
             }
 
             .falling {
                 position: absolute;
-                background: white;
-                color: black;
-                padding: 8px 12px;
-                border-radius: 8px;
-                font-weight: bold;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                color: #1a1a2e;
+                padding: 10px 16px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 16px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.3);
             }
 
-            #scoreBoard {
-                padding: 10px;
-                font-size: 18px;
+            .falling sub {
+                font-size: 0.7em;
+                vertical-align: sub;
+            }
+
+            /* Header */
+            .game-header {
+                padding: 16px 20px 8px;
+            }
+
+            #instruction {
+                font-size: 20px;
+                font-weight: 700;
+                margin-bottom: 8px;
+                background: linear-gradient(135deg, #fff, #a8c0ff);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
             }
 
             .guide {
                 max-width: 900px;
-                margin: 10px auto 0 auto;
-                padding: 10px 14px;
-                border-radius: 10px;
-                background: rgba(255, 255, 255, 0.12);
-                font-size: 15px;
-                line-height: 1.4;
+                margin: 0 auto 8px auto;
+                padding: 8px 16px;
+                border-radius: 12px;
+                background: rgba(255, 255, 255, 0.08);
+                font-size: 13px;
+                line-height: 1.5;
+                color: rgba(255, 255, 255, 0.7);
             }
 
+            /* Scoreboard */
+            #scoreBoard {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 16px;
+                flex-wrap: wrap;
+                padding: 10px 20px;
+                font-size: 15px;
+            }
+
+            #scoreBoard > span {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: rgba(255, 255, 255, 0.08);
+                padding: 6px 12px;
+                border-radius: 10px;
+            }
+
+            #scoreBoard strong {
+                font-weight: 700;
+                color: #fff;
+            }
+
+            .score-icon {
+                font-size: 18px;
+            }
+
+            .streak-bar {
+                width: 100%;
+                max-width: 500px;
+                margin: 6px auto 0 auto;
+                height: 6px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 3px;
+                overflow: hidden;
+            }
+
+            .streak-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #00c6ff, #0072ff);
+                width: 0%;
+                transition: width 0.3s ease;
+                border-radius: 3px;
+            }
+
+            .streak-label {
+                font-size: 12px;
+                color: rgba(255, 255, 255, 0.5);
+                margin-top: 3px;
+            }
+
+            /* Controls */
             .controls {
+                margin-top: 12px;
+                user-select: none;
+                -webkit-user-select: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .controls button {
+                width: 70px;
+                height: 56px;
+                margin: 6px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 14px;
+                font-size: 24px;
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                cursor: pointer;
+                transition: all 0.2s;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .controls button:active {
+                background: rgba(255, 255, 255, 0.25);
+                transform: scale(0.95);
+            }
+
+            /* Score popup animation */
+            .score-popup {
+                position: absolute;
+                font-size: 20px;
+                font-weight: 800;
+                pointer-events: none;
+                animation: scoreFloat 1s ease-out forwards;
+                z-index: 100;
+                text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            }
+
+            @keyframes scoreFloat {
+                0% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateY(-60px);
+                }
+            }
+
+            /* Modal */
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            }
+
+            .modal-overlay.show {
+                display: flex;
+            }
+
+            .modal-content {
+                background: linear-gradient(135deg, #1a1a2e, #16213e);
+                color: white;
+                padding: 36px;
+                border-radius: 24px;
+                max-width: 520px;
+                width: 90%;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                text-align: center;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                animation: modalPop 0.3s ease-out;
+            }
+
+            @keyframes modalPop {
+                from {
+                    opacity: 0;
+                    transform: scale(0.9);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+
+            .modal-content h2 {
+                margin-top: 0;
+                margin-bottom: 16px;
+                font-size: 24px;
+                font-weight: 800;
+            }
+
+            .modal-content .modal-icon {
+                font-size: 56px;
+                margin-bottom: 12px;
+            }
+
+            .modal-content ul {
+                text-align: left;
+                padding-left: 20px;
+                margin: 16px 0;
+            }
+
+            .modal-content li {
+                margin: 10px 0;
+                line-height: 1.5;
+                color: rgba(255, 255, 255, 0.85);
+            }
+
+            .modal-content li strong {
+                color: #fff;
+            }
+
+            .modal-content .start-btn {
+                display: inline-block;
+                padding: 16px 44px;
+                background: linear-gradient(135deg, #00c6ff, #0072ff);
+                color: white;
+                font-size: 18px;
+                font-weight: 700;
+                border: none;
+                border-radius: 14px;
+                cursor: pointer;
+                margin-top: 18px;
+                transition: all 0.3s;
+                box-shadow: 0 6px 20px rgba(0, 114, 255, 0.4);
+            }
+
+            .modal-content .start-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 30px rgba(0, 114, 255, 0.6);
+            }
+
+            .modal-content .start-btn.secondary {
+                background: rgba(255, 255, 255, 0.1);
+                box-shadow: none;
+                font-size: 15px;
+                padding: 12px 32px;
                 margin-top: 10px;
             }
 
-            button {
-                padding: 10px 20px;
-                margin: 5px;
-                border: none;
-                border-radius: 8px;
+            .modal-content .start-btn.secondary:hover {
+                background: rgba(255, 255, 255, 0.15);
+            }
+
+            .game-stats {
+                font-size: 32px;
+                font-weight: 800;
+                margin: 12px 0;
+                background: linear-gradient(135deg, #fff, #a8c0ff);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .game-stats ul {
+                list-style: none;
+                padding: 0;
+            }
+
+            .game-stats ul li {
+                padding: 6px 0;
+            }
+
+            .new-high-score {
+                color: #FFD700;
                 font-size: 18px;
+                font-weight: 700;
+                animation: glow 1s ease-in-out infinite alternate;
+            }
+
+            @keyframes glow {
+                from { text-shadow: 0 0 5px #FFD700; }
+                to { text-shadow: 0 0 20px #FFD700, 0 0 30px #FFD700; }
             }
         </style>
     </head>
     <body>
-        <h2 id="instruction">Puua ainult: OKSIIDID</h2>
-        <div class="guide">
-            Juhend: liiguta korvi nooltega (voi puuteekraanil sormega) ja pyya ainult neid aineid, mida juhises naidatakse.
-            Kui pyyad vale aine voi lased oige aine mooda, kaotad elu.
-            Sihtgrupp vahetub mangu jooksul automaatselt.
+        <!-- Start Modal -->
+        <div id="startModal" class="modal-overlay show">
+            <div class="modal-content">
+                <div class="modal-icon">🧪</div>
+                <h2>Kuidas mängida?</h2>
+                <ul>
+                    <li><strong>Eesmärk:</strong> Püüa korviga ainult neid aineid, mida juhises näidatakse.</li>
+                    <li><strong>Juhised:</strong>
+                        <ul>
+                            <li>Arvutis: kasuta nooleklahve ← ja →</li>
+                            <li>Mobiilis: vajuta vasak/parem nuppe või lohista sõrmega ekraanil</li>
+                        </ul>
+                    </li>
+                    <li><strong>Kaotad elu, kui:</strong>
+                        <ul>
+                            <li>Püüad vale aine (mitte sihtgrupist)</li>
+                            <li>Lased õige aine mööda</li>
+                        </ul>
+                    </li>
+                    <li><strong>Seeria boonus:</strong> Mida rohkem järjest püüad, seda rohkem punktid saad (kuni x5)!</li>
+                    <li><strong>Kokku 6 kategooriat:</strong> Oksiidid, Happed, Alused, Soolad, Metallid, Mittemetallid.</li>
+                </ul>
+                <button class="start-btn" onclick="startGame()">
+                    <i class="fas fa-play"></i> Alusta!
+                </button>
+            </div>
         </div>
-        <div id="scoreBoard">Punktid: 0 | Elud: 3</div>
+
+        <div class="game-header">
+            <h2 id="instruction">Püüa ainult: OKSIIDID</h2>
+            <div class="guide">
+                Liiguta korvi nooltega või puuteekraanil sõrmega. Püüa ainult neid aineid, mida juhises näidatakse.
+            </div>
+        </div>
+
+        <div id="scoreBoard">
+            <span><span class="score-icon">⭐</span> Punktid: <strong id="scoreValue">0</strong></span>
+            <span><span class="score-icon">❤️</span> Elud: <strong id="livesValue">3</strong></span>
+            <span><span class="score-icon">🔥</span> Seeria: <strong id="streakValue">0</strong></span>
+            <span><span class="score-icon">👑</span> Parim: <strong id="highScoreValue">0</strong></span>
+        </div>
+        <div class="streak-bar">
+            <div class="streak-fill" id="streakFill"></div>
+        </div>
+        <div class="streak-label" id="streakLabel">Järgmine punkt: x1</div>
 
         <div id="gameArea">
             <div id="basket">OKSIID</div>
         </div>
 
         <div class="controls">
-            <button onclick="moveLeft()">&#9664;</button>
-            <button onclick="moveRight()">&#9654;</button>
+            <button ontouchstart="moveLeftHold(event)" ontouchend="stopMove()" onmousedown="moveLeftHold(event)" onmouseup="stopMove()" onmouseleave="stopMove()"><i class="fas fa-chevron-left"></i></button>
+            <button ontouchstart="moveRightHold(event)" ontouchend="stopMove()" onmousedown="moveRightHold(event)" onmouseup="stopMove()" onmouseleave="stopMove()"><i class="fas fa-chevron-right"></i></button>
         </div>
 
         <audio id="bgMusic" loop autoplay>
@@ -104,93 +413,65 @@
             var instruction = document.getElementById("instruction");
             var score = 0;
             var lives = 3;
+            var gameStarted = false;
+            var isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent) || ("ontouchstart" in window && window.innerWidth < 1024);
 
+            var moveInterval = null;
+
+            // Score system
+            var streak = 0;
+            var highScore = parseInt(localStorage.getItem("chemistryGameHighScore") || "0");
+            var multiplier = 1;
+            var totalCatches = 0;
+            var totalMisses = 0;
+            var categoriesCompleted = 0;
+            var startTime = 0;
+
+            document.getElementById("highScoreValue").innerText = highScore;
 
             gameArea.addEventListener("touchmove", function (e) {
                 e.preventDefault();
-            
+
                 let touch = e.touches[0];
                 let gameRect = gameArea.getBoundingClientRect();
                 let basketWidth = basket.offsetWidth;
-            
-                // Center basket on finger
+
                 let newLeft = touch.clientX - gameRect.left - basketWidth / 2;
-            
-                // Keep inside game area
+
                 if (newLeft < 0) newLeft = 0;
                 if (newLeft > gameArea.offsetWidth - basketWidth)
                     newLeft = gameArea.offsetWidth - basketWidth;
-            
+
                 basket.style.left = newLeft + "px";
-            
+
             }, { passive: false });
-                
-                var targetLabels = {
-                    oksiid: "OKSIIDID",
-                    hape: "HAPPED",
-                    alus: "ALUSED",
-                    sool: "SOOLAD",
-                    metall: "METALLID",
-                    mittemetall: "MITTEMETALLID",
+
+            var targetLabels = {
+                oksiid: "OKSIIDID",
+                hape: "HAPPED",
+                alus: "ALUSED",
+                sool: "SOOLAD",
+                metall: "METALLID",
+                mittemetall: "MITTEMETALLID",
             };
 
             var metals = new Set([
-                "Li",
-                "Na",
-                "K",
-                "Rb",
-                "Cs",
-                "Fr",
-                "Be",
-                "Mg",
-                "Ca",
-                "Sr",
-                "Ba",
-                "Ra",
-                "Sc",
-                "Ti",
-                "V",
-                "Cr",
-                "Mn",
-                "Fe",
-                "Co",
-                "Ni",
-                "Cu",
-                "Zn",
-                "Y",
-                "Zr",
-                "Nb",
-                "Mo",
-                "Tc",
-                "Ru",
-                "Rh",
-                "Pd",
-                "Ag",
-                "Cd",
-                "Hf",
-                "Ta",
-                "W",
-                "Re",
-                "Os",
-                "Ir",
-                "Pt",
-                "Au",
-                "Hg",
-                "Al",
-                "Ga",
-                "In",
-                "Sn",
-                "Tl",
-                "Pb",
-                "Bi",
+                "Li", "Na", "K", "Rb", "Cs", "Fr", "Be", "Mg", "Ca", "Sr", "Ba", "Ra",
+                "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Y", "Zr",
+                "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "Hf", "Ta", "W", "Re",
+                "Os", "Ir", "Pt", "Au", "Hg", "Al", "Ga", "In", "Sn", "Tl", "Pb", "Bi",
             ]);
 
             var rawElementsFallback =
-                "SiO2,  H2, KOH,  H2SO4, Fe, ZnO, Ca(OH)2, H2CO3, MgO, NaNO2, Kl, CO2, CaCO3, SO2, HCl, Al(OH)3, NaCl, HNO3, CO, Mg(OH)2, SO3, MgSO4, KNO3, H2SO3, CO, NaOH, H2CO3, HCl, N2, KOH, CaSO4,  NaF, CO2, H2SO4, Fe, Ca(OH)2, NaCl, NO2, H2SO3, CaCO3, Al, O2, KI, SiO2, AlCl3, CaO, SO2, NaNO2, Na2CO3, MgCl2, H3PO4";
+                "SiO2, H2, KOH, H2SO4, Fe, ZnO, Ca(OH)2, H2CO3, MgO, NaNO2, KI, CO2, CaCO3, SO2, HCl, Al(OH)3, NaCl, HNO3, CO, Mg(OH)2, SO3, MgSO4, KNO3, H2SO3, NaOH, N2, CaSO4, NaF, NO2, Al, O2, AlCl3, CaO, Na2CO3, MgCl2, H3PO4";
 
             function normalizeFormula(formula) {
                 if (formula === "Kl") return "KI";
                 return formula;
+            }
+
+            function formatFormula(text) {
+                return text.replace(/(\d+)/g, "<sub>$1</sub>");
             }
 
             function classifyFormula(name) {
@@ -206,25 +487,17 @@
                 }
 
                 if (hasOH && !startsWithH) return "alus";
-                if (startsWithH && !hasOH && !/^H\d*$/.test(name))
-                    return "hape";
-                if (
-                    uniqueSymbols.length === 2 &&
-                    uniqueSymbols.indexOf("O") !== -1
-                )
-                    return "oksiid";
+                if (startsWithH && !hasOH && !/^H\d*$/.test(name)) return "hape";
+                if (uniqueSymbols.length === 2 && uniqueSymbols.indexOf("O") !== -1) return "oksiid";
                 return "sool";
             }
 
             function parseSubstances(source) {
                 var unique = Array.from(
                     new Set(
-                        source
-                            .split(",")
-                            .map(function (x) {
-                                return normalizeFormula(x.trim());
-                            })
-                            .filter(Boolean),
+                        source.split(",").map(function (x) {
+                            return normalizeFormula(x.trim());
+                        }).filter(Boolean),
                     ),
                 );
 
@@ -243,8 +516,38 @@
             var missSound = document.getElementById("missSound");
 
             function updateScore() {
-                document.getElementById("scoreBoard").innerText =
-                    "Punktid: " + score + " | Elud: " + lives;
+                document.getElementById("scoreValue").innerText = score;
+                document.getElementById("livesValue").innerText = lives;
+                document.getElementById("streakValue").innerText = streak;
+                document.getElementById("highScoreValue").innerText = highScore;
+
+                var streakPercent = Math.min((streak % 5) / 5 * 100, 100);
+                document.getElementById("streakFill").style.width = streakPercent + "%";
+                document.getElementById("streakLabel").innerText = "Järgmine punkt: x" + multiplier;
+            }
+
+            function showScorePopup(x, y, text, color) {
+                var popup = document.createElement("div");
+                popup.className = "score-popup";
+                popup.innerText = text;
+                popup.style.color = color;
+                popup.style.left = x + "px";
+                popup.style.top = y + "px";
+                gameArea.appendChild(popup);
+                setTimeout(function () { popup.remove(); }, 1000);
+            }
+
+            function updateStreak(success) {
+                if (success) {
+                    streak++;
+                    totalCatches++;
+                    multiplier = 1 + Math.floor(streak / 5);
+                    if (multiplier > 5) multiplier = 5;
+                } else {
+                    streak = 0;
+                    totalMisses++;
+                    multiplier = 1;
+                }
             }
 
             function targetLabel(type) {
@@ -260,8 +563,7 @@
             }
 
             function updateTargetUI() {
-                instruction.innerText =
-                    "Puua ainult: " + targetLabel(currentTarget);
+                instruction.innerText = "Püüa ainult: " + targetLabel(currentTarget);
                 basket.innerText = basketLabel(currentTarget);
             }
 
@@ -269,10 +571,7 @@
                 if (availableTargets.length < 2) return;
                 var next = currentTarget;
                 while (next === currentTarget) {
-                    next =
-                        availableTargets[
-                            Math.floor(Math.random() * availableTargets.length)
-                        ];
+                    next = availableTargets[Math.floor(Math.random() * availableTargets.length)];
                 }
                 currentTarget = next;
                 updateTargetUI();
@@ -291,6 +590,10 @@
                 var needed = itemsByType[currentTarget] || new Set();
                 var caught = caughtByType[currentTarget] || new Set();
                 if (needed.size > 0 && caught.size >= needed.size) {
+                    categoriesCompleted++;
+                    var bonusPoints = 10 * multiplier;
+                    score += bonusPoints;
+                    showScorePopup(window.innerWidth / 2 - 50, gameArea.offsetHeight / 2, "🎉 BOONUS: +" + bonusPoints + "!", "#FFD700");
                     advanceTarget();
                 }
             }
@@ -306,28 +609,47 @@
                     basket.style.left = left + 30 + "px";
             }
 
+            function moveLeftHold(e) {
+                if (e) e.preventDefault();
+                if (moveInterval) return;
+                moveLeft();
+                moveInterval = setInterval(moveLeft, 100);
+            }
+
+            function moveRightHold(e) {
+                if (e) e.preventDefault();
+                if (moveInterval) return;
+                moveRight();
+                moveInterval = setInterval(moveRight, 100);
+            }
+
+            function stopMove() {
+                if (moveInterval) {
+                    clearInterval(moveInterval);
+                    moveInterval = null;
+                }
+            }
+
             document.addEventListener("keydown", function (e) {
                 if (e.key === "ArrowLeft") moveLeft();
                 if (e.key === "ArrowRight") moveRight();
             });
 
             function createFalling() {
-                if (!substances.length) return;
-                var sub =
-                    substances[Math.floor(Math.random() * substances.length)];
+                if (!gameStarted || !substances.length) return;
+                var sub = substances[Math.floor(Math.random() * substances.length)];
                 var div = document.createElement("div");
                 div.className = "falling";
-                div.innerText = sub.name;
-                div.style.left =
-                    Math.random() * (window.innerWidth - 100) + "px";
+                div.innerHTML = formatFormula(sub.name);
+                div.style.left = Math.random() * (window.innerWidth - 100) + "px";
                 div.style.top = "0px";
                 div.dataset.type = sub.type;
                 gameArea.appendChild(div);
 
-                var fallSpeed = 4;
-                if (score > 10) fallSpeed = 6;
-                if (score > 20) fallSpeed = 8;
-                if (score > 30) fallSpeed = 10;
+                var fallSpeed = isMobile ? 2 : 4;
+                if (score > 10) fallSpeed = isMobile ? 3 : 6;
+                if (score > 20) fallSpeed = isMobile ? 4 : 8;
+                if (score > 30) fallSpeed = isMobile ? 5 : 10;
 
                 var fall = setInterval(function () {
                     var top = parseInt(div.style.top, 10);
@@ -340,23 +662,27 @@
                         var basketRight = basketLeft + basket.offsetWidth;
                         var itemLeft = div.offsetLeft;
                         var itemRight = itemLeft + div.offsetWidth;
-                        var collected =
-                            itemRight > basketLeft && itemLeft < basketRight;
+                        var collected = itemRight > basketLeft && itemLeft < basketRight;
 
                         if (collected) {
                             if (div.dataset.type === currentTarget) {
-                                score++;
-                                caughtByType[currentTarget] =
-                                    caughtByType[currentTarget] || new Set();
+                                var points = 1 * multiplier;
+                                score += points;
+                                updateStreak(true);
+                                caughtByType[currentTarget] = caughtByType[currentTarget] || new Set();
                                 caughtByType[currentTarget].add(sub.name);
                                 catchSound.play();
+                                showScorePopup(div.offsetLeft, top - 20, "+" + points, "#2ecc71");
                                 checkTargetCompleted();
                             } else {
                                 lives--;
+                                updateStreak(false);
                                 missSound.play();
+                                showScorePopup(div.offsetLeft, top - 20, "✘ VALE!", "#e74c3c");
                             }
                         } else if (div.dataset.type === currentTarget) {
                             lives--;
+                            updateStreak(false);
                             missSound.play();
                         }
 
@@ -364,35 +690,113 @@
                         div.remove();
 
                         if (lives <= 0) {
-                            lives = 3;
-                            advanceTarget();
-                            updateScore();
+                            gameStarted = false;
+                            showGameOver();
                         }
                     }
                 }, 20);
             }
 
-            setInterval(createFalling, 1500);
+            setInterval(createFalling, isMobile ? 2500 : 1500);
+
+            function startGame() {
+                document.getElementById("startModal").classList.remove("show");
+                gameStarted = true;
+                score = 0;
+                lives = 3;
+                streak = 0;
+                multiplier = 1;
+                totalCatches = 0;
+                totalMisses = 0;
+                categoriesCompleted = 0;
+                startTime = Date.now();
+                updateScore();
+            }
+
+            function showGameOver() {
+                var elapsed = Math.floor((Date.now() - startTime) / 1000);
+                var minutes = Math.floor(elapsed / 60);
+                var seconds = elapsed % 60;
+                var timeStr = minutes + "m " + seconds + "s";
+
+                var newHighScore = false;
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem("chemistryGameHighScore", highScore.toString());
+                    newHighScore = true;
+                }
+
+                var modalHTML = `
+                    <div id="gameOverModal" class="modal-overlay show">
+                        <div class="modal-content">
+                            <div class="modal-icon">🎮</div>
+                            <h2>Mäng läbi!</h2>
+                            ${newHighScore ? '<p class="new-high-score">🎉 UUS REKORD! 🎉</p>' : ''}
+                            <div class="game-stats">⭐ ${score} punkti</div>
+                            <ul>
+                                <li>👑 Parim tulemus: <strong>${highScore}</strong></li>
+                                <li>🔥 Püüdmisi: <strong>${totalCatches}</strong></li>
+                                <li>📊 Kategooriad läbitud: <strong>${categoriesCompleted}</strong></li>
+                                <li>⏱️ Mängitud: <strong>${timeStr}</strong></li>
+                            </ul>
+                            <button class="start-btn" onclick="restartGame()">
+                                <i class="fas fa-redo"></i> Mängi uuesti
+                            </button>
+                            <br>
+                            <button class="start-btn secondary" onclick="goToMenu()">
+                                <i class="fas fa-home"></i> Tagasi menüüsse
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML("beforeend", modalHTML);
+            }
+
+            function restartGame() {
+                var modal = document.getElementById("gameOverModal");
+                if (modal) modal.remove();
+
+                document.querySelectorAll(".falling").forEach(function (el) { el.remove(); });
+
+                score = 0;
+                lives = 3;
+                streak = 0;
+                multiplier = 1;
+                totalCatches = 0;
+                totalMisses = 0;
+                categoriesCompleted = 0;
+                currentTarget = availableTargets[0] || "oksiid";
+                itemsByType = {};
+                caughtByType = {};
+                substances.forEach(function (item) {
+                    if (!itemsByType[item.type]) itemsByType[item.type] = new Set();
+                    itemsByType[item.type].add(item.name);
+                });
+                resetCatchProgressForCurrentTarget();
+                updateTargetUI();
+                updateScore();
+                gameStarted = true;
+                startTime = Date.now();
+            }
+
+            function goToMenu() {
+                window.location.href = "index.html";
+            }
 
             function initGameData(rawElements) {
                 substances = parseSubstances(rawElements);
                 availableTargets = Array.from(
                     new Set(
-                        substances
-                            .map(function (s) {
-                                return s.type;
-                            })
-                            .filter(function (type) {
-                                return targetLabels[type];
-                            }),
+                        substances.map(function (s) { return s.type; }).filter(function (type) {
+                            return targetLabels[type];
+                        }),
                     ),
                 );
                 currentTarget = availableTargets[0] || "oksiid";
                 itemsByType = {};
                 caughtByType = {};
                 substances.forEach(function (item) {
-                    if (!itemsByType[item.type])
-                        itemsByType[item.type] = new Set();
+                    if (!itemsByType[item.type]) itemsByType[item.type] = new Set();
                     itemsByType[item.type].add(item.name);
                 });
                 resetCatchProgressForCurrentTarget();
